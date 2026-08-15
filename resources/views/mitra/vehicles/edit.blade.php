@@ -57,12 +57,21 @@
                     </div>
 
                     <div>
-                        <label class="mb-1.5 block text-sm font-medium text-slate-700">Harga Sewa Per Hari</label>
+                        <label class="mb-1.5 block text-sm font-medium text-slate-700">Harga Sewa Tanpa Sopir (per hari)</label>
                         <div class="relative">
                             <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-sm text-slate-500">Rp</span>
-                            <input type="number" name="harga_sewa_per_hari" value="{{ old('harga_sewa_per_hari', $vehicle->harga_sewa_per_hari) }}" class="w-full rounded-xl border border-slate-300 py-2.5 pl-10 pr-4 text-sm text-slate-800 transition focus:border-[#3F7D6C] focus:outline-none focus:ring-2 focus:ring-[#3F7D6C]/20" required>
+                            <input type="number" name="harga_sewa_tanpa_sopir_per_hari" value="{{ old('harga_sewa_tanpa_sopir_per_hari', $vehicle->harga_sewa_tanpa_sopir_per_hari) }}" class="w-full rounded-xl border border-slate-300 py-2.5 pl-10 pr-4 text-sm text-slate-800 transition focus:border-[#3F7D6C] focus:outline-none focus:ring-2 focus:ring-[#3F7D6C]/20" required>
                         </div>
-                        @error('harga_sewa_per_hari') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                        @error('harga_sewa_tanpa_sopir_per_hari') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label class="mb-1.5 block text-sm font-medium text-slate-700">Harga Sewa Dengan Sopir (per hari)</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-sm text-slate-500">Rp</span>
+                            <input type="number" name="harga_sewa_dengan_sopir_per_hari" value="{{ old('harga_sewa_dengan_sopir_per_hari', $vehicle->harga_sewa_dengan_sopir_per_hari) }}" class="w-full rounded-xl border border-slate-300 py-2.5 pl-10 pr-4 text-sm text-slate-800 transition focus:border-[#3F7D6C] focus:outline-none focus:ring-2 focus:ring-[#3F7D6C]/20" required>
+                        </div>
+                        @error('harga_sewa_dengan_sopir_per_hari') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                     </div>
 
                     <div class="md:col-span-2">

@@ -33,7 +33,7 @@ class BookingServiceTest extends TestCase
     public function test_calculate_total_price_returns_correct_amount(): void
     {
         $vehicle = new Vehicle([
-            'harga_sewa_per_hari' => 200000,
+            'harga_sewa_tanpa_sopir_per_hari' => 200000, 'harga_sewa_dengan_sopir_per_hari' => 200000,
         ]);
 
         $total = $this->bookingService->calculateTotalPrice($vehicle, '2026-08-10', '2026-08-12', 'rental', null, 3);
@@ -44,7 +44,7 @@ class BookingServiceTest extends TestCase
     public function test_calculate_total_price_for_single_day_returns_daily_rate(): void
     {
         $vehicle = new Vehicle([
-            'harga_sewa_per_hari' => 150000,
+            'harga_sewa_tanpa_sopir_per_hari' => 150000, 'harga_sewa_dengan_sopir_per_hari' => 150000,
         ]);
 
         $total = $this->bookingService->calculateTotalPrice($vehicle, '2026-08-10', '2026-08-10');
@@ -62,7 +62,7 @@ class BookingServiceTest extends TestCase
             'plat_nomor' => 'B 1111 XX',
             'jenis' => 'sedan',
             'status' => 'tersedia',
-            'harga_sewa_per_hari' => 100000,
+            'harga_sewa_tanpa_sopir_per_hari' => 100000, 'harga_sewa_dengan_sopir_per_hari' => 100000,
             'is_approved' => true,
         ]);
 
@@ -90,7 +90,7 @@ class BookingServiceTest extends TestCase
             'plat_nomor' => 'B 2222 XX',
             'jenis' => 'sedan',
             'status' => 'tersedia',
-            'harga_sewa_per_hari' => 100000,
+            'harga_sewa_tanpa_sopir_per_hari' => 100000, 'harga_sewa_dengan_sopir_per_hari' => 100000,
             'is_approved' => true,
         ]);
 
@@ -118,7 +118,7 @@ class BookingServiceTest extends TestCase
             'plat_nomor' => 'B 3333 XX',
             'jenis' => 'sedan',
             'status' => 'tersedia',
-            'harga_sewa_per_hari' => 100000,
+            'harga_sewa_tanpa_sopir_per_hari' => 100000, 'harga_sewa_dengan_sopir_per_hari' => 100000,
             'is_approved' => true,
         ]);
 
@@ -147,7 +147,7 @@ class BookingServiceTest extends TestCase
             'plat_nomor' => 'B 4444 XX',
             'jenis' => 'sedan',
             'status' => 'tersedia',
-            'harga_sewa_per_hari' => 100000,
+            'harga_sewa_tanpa_sopir_per_hari' => 100000, 'harga_sewa_dengan_sopir_per_hari' => 100000,
             'is_approved' => true,
         ]);
 
@@ -177,7 +177,7 @@ class BookingServiceTest extends TestCase
             'plat_nomor' => 'B 5555 XX',
             'jenis' => 'sedan',
             'status' => 'tersedia',
-            'harga_sewa_per_hari' => 100000,
+            'harga_sewa_tanpa_sopir_per_hari' => 100000, 'harga_sewa_dengan_sopir_per_hari' => 100000,
             'is_approved' => true,
         ]);
 
@@ -206,7 +206,7 @@ class BookingServiceTest extends TestCase
             'plat_nomor' => 'B 6666 XX',
             'jenis' => 'sedan',
             'status' => 'tersedia',
-            'harga_sewa_per_hari' => 200000,
+            'harga_sewa_tanpa_sopir_per_hari' => 200000, 'harga_sewa_dengan_sopir_per_hari' => 200000,
             'is_approved' => true,
         ]);
 
@@ -228,7 +228,7 @@ class BookingServiceTest extends TestCase
             'plat_nomor' => 'B 7777 XX',
             'jenis' => 'sedan',
             'status' => 'disewa',
-            'harga_sewa_per_hari' => 100000,
+            'harga_sewa_tanpa_sopir_per_hari' => 100000, 'harga_sewa_dengan_sopir_per_hari' => 100000,
             'is_approved' => true,
         ]);
 

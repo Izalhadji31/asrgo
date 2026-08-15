@@ -25,7 +25,7 @@ class BookingValidationTest extends TestCase
             'plat_nomor' => 'ABC 1111',
             'jenis' => 'mobil',
             'status' => 'tersedia',
-            'harga_sewa_per_hari' => 150000,
+            'harga_sewa_tanpa_sopir_per_hari' => 150000, 'harga_sewa_dengan_sopir_per_hari' => 150000,
             'is_approved' => true,
         ]);
 
@@ -61,7 +61,7 @@ class BookingValidationTest extends TestCase
             'jenis' => 'MPV',
             'kapasitas_penumpang' => 6,
             'status' => 'tersedia',
-            'harga_sewa_per_hari' => 200000,
+            'harga_sewa_tanpa_sopir_per_hari' => 200000, 'harga_sewa_dengan_sopir_per_hari' => 200000,
             'is_approved' => true,
         ]);
         $date = today()->addDay()->toDateString();
@@ -98,7 +98,7 @@ class BookingValidationTest extends TestCase
             'plat_nomor' => 'ABC 2222',
             'jenis' => 'mobil',
             'status' => 'tersedia',
-            'harga_sewa_per_hari' => 120000,
+            'harga_sewa_tanpa_sopir_per_hari' => 120000, 'harga_sewa_dengan_sopir_per_hari' => 120000,
             'is_approved' => true,
         ]);
 
@@ -139,7 +139,7 @@ class BookingValidationTest extends TestCase
             'plat_nomor' => 'ABC 2233',
             'jenis' => 'mobil',
             'status' => 'tersedia',
-            'harga_sewa_per_hari' => 100000,
+            'harga_sewa_tanpa_sopir_per_hari' => 100000, 'harga_sewa_dengan_sopir_per_hari' => 100000,
             'is_approved' => true,
         ]);
         $booking = Booking::create([
@@ -171,7 +171,7 @@ class BookingValidationTest extends TestCase
             'plat_nomor' => 'ABC 2244',
             'jenis' => 'mobil',
             'status' => 'tersedia',
-            'harga_sewa_per_hari' => 100000,
+            'harga_sewa_tanpa_sopir_per_hari' => 100000, 'harga_sewa_dengan_sopir_per_hari' => 100000,
             'is_approved' => true,
         ]);
         $booking = Booking::create([
@@ -204,7 +204,7 @@ class BookingValidationTest extends TestCase
             'jenis' => 'MPV',
             'kapasitas_penumpang' => 4,
             'status' => 'tersedia',
-            'harga_sewa_per_hari' => 100000,
+            'harga_sewa_tanpa_sopir_per_hari' => 100000, 'harga_sewa_dengan_sopir_per_hari' => 100000,
             'is_approved' => true,
         ]);
         $travelVehicle = Vehicle::create([
@@ -215,7 +215,7 @@ class BookingValidationTest extends TestCase
             'jenis' => 'MPV',
             'kapasitas_penumpang' => 4,
             'status' => 'tersedia',
-            'harga_sewa_per_hari' => 100000,
+            'harga_sewa_tanpa_sopir_per_hari' => 100000, 'harga_sewa_dengan_sopir_per_hari' => 100000,
             'is_approved' => true,
         ]);
         $route = Route::create([
@@ -269,7 +269,7 @@ class BookingValidationTest extends TestCase
             'jenis' => 'MPV',
             'kapasitas_penumpang' => 4,
             'status' => 'tersedia',
-            'harga_sewa_per_hari' => 100000,
+            'harga_sewa_tanpa_sopir_per_hari' => 100000, 'harga_sewa_dengan_sopir_per_hari' => 100000,
             'is_approved' => true,
         ]);
         $date = today()->addDay()->toDateString();
@@ -338,7 +338,7 @@ class BookingValidationTest extends TestCase
             'plat_nomor' => 'ABC 3333',
             'jenis' => 'mobil',
             'status' => 'disewa',
-            'harga_sewa_per_hari' => 110000,
+            'harga_sewa_tanpa_sopir_per_hari' => 110000, 'harga_sewa_dengan_sopir_per_hari' => 110000,
             'is_approved' => true,
         ]);
 
@@ -371,7 +371,7 @@ class BookingValidationTest extends TestCase
             'plat_nomor' => 'ABC 4444',
             'jenis' => 'mobil',
             'status' => 'tersedia',
-            'harga_sewa_per_hari' => 100000,
+            'harga_sewa_tanpa_sopir_per_hari' => 100000, 'harga_sewa_dengan_sopir_per_hari' => 100000,
             'is_approved' => true,
         ]);
         $booking = Booking::create([
@@ -440,7 +440,7 @@ class BookingValidationTest extends TestCase
             'jenis' => 'MPV',
             'kapasitas_penumpang' => 2,
             'status' => 'tersedia',
-            'harga_sewa_per_hari' => 100000,
+            'harga_sewa_tanpa_sopir_per_hari' => 100000, 'harga_sewa_dengan_sopir_per_hari' => 100000,
             'is_approved' => true,
         ]);
         $secondVehicle = Vehicle::create([
@@ -451,7 +451,7 @@ class BookingValidationTest extends TestCase
             'jenis' => 'MPV',
             'kapasitas_penumpang' => 2,
             'status' => 'tersedia',
-            'harga_sewa_per_hari' => 100000,
+            'harga_sewa_tanpa_sopir_per_hari' => 100000, 'harga_sewa_dengan_sopir_per_hari' => 100000,
             'is_approved' => true,
         ]);
         $route = Route::create([
@@ -517,7 +517,7 @@ class BookingValidationTest extends TestCase
             'jenis' => 'MPV',
             'kapasitas_penumpang' => 4,
             'status' => 'tersedia',
-            'harga_sewa_per_hari' => 100000,
+            'harga_sewa_tanpa_sopir_per_hari' => 100000, 'harga_sewa_dengan_sopir_per_hari' => 100000,
             'is_approved' => true,
         ]);
         $secondVehicle = Vehicle::create([
@@ -528,7 +528,7 @@ class BookingValidationTest extends TestCase
             'jenis' => 'MPV',
             'kapasitas_penumpang' => 4,
             'status' => 'tersedia',
-            'harga_sewa_per_hari' => 100000,
+            'harga_sewa_tanpa_sopir_per_hari' => 100000, 'harga_sewa_dengan_sopir_per_hari' => 100000,
             'is_approved' => true,
         ]);
         $route = Route::create([
@@ -590,7 +590,7 @@ class BookingValidationTest extends TestCase
             'jenis' => 'MPV',
             'kapasitas_penumpang' => 7,
             'status' => 'tersedia',
-            'harga_sewa_per_hari' => 100000,
+            'harga_sewa_tanpa_sopir_per_hari' => 100000, 'harga_sewa_dengan_sopir_per_hari' => 100000,
             'is_approved' => true,
         ]);
         $route = Route::create([

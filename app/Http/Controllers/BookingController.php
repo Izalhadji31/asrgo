@@ -107,7 +107,9 @@ class BookingController extends Controller
             'plat_nomor' => $vehicle->plat_nomor,
             'foto' => $vehicle->foto ? Storage::url($vehicle->foto) : '',
             'jenis' => $vehicle->jenis,
-            'harga' => $vehicle->harga_sewa_per_hari,
+            'harga' => $vehicle->harga_sewa_dengan_sopir_per_hari,
+            'harga_tanpa_sopir' => $vehicle->harga_sewa_tanpa_sopir_per_hari,
+            'harga_dengan_sopir' => $vehicle->harga_sewa_dengan_sopir_per_hari,
         ])->values();
 
         $routes = Route::with(['assignments.mitra.vehicles.sopir'])

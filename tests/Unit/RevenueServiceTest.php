@@ -37,7 +37,7 @@ class RevenueServiceTest extends TestCase
             'plat_nomor' => 'B 8888 XX',
             'jenis' => 'sedan',
             'status' => 'disewa',
-            'harga_sewa_per_hari' => 500000,
+            'harga_sewa_tanpa_sopir_per_hari' => 500000, 'harga_sewa_dengan_sopir_per_hari' => 500000,
             'is_approved' => true,
         ]);
 
@@ -76,7 +76,7 @@ class RevenueServiceTest extends TestCase
             'plat_nomor' => 'B 9999 XX',
             'jenis' => 'suv',
             'status' => 'disewa',
-            'harga_sewa_per_hari' => 400000,
+            'harga_sewa_tanpa_sopir_per_hari' => 400000, 'harga_sewa_dengan_sopir_per_hari' => 400000,
             'is_approved' => true,
         ]);
 
@@ -113,7 +113,7 @@ class RevenueServiceTest extends TestCase
             'plat_nomor' => 'B 0000 XX',
             'jenis' => 'suv',
             'status' => 'disewa',
-            'harga_sewa_per_hari' => 400000,
+            'harga_sewa_tanpa_sopir_per_hari' => 400000, 'harga_sewa_dengan_sopir_per_hari' => 400000,
             'is_approved' => true,
         ]);
 
@@ -142,7 +142,7 @@ class RevenueServiceTest extends TestCase
             'plat_nomor' => 'B 1212 XX',
             'jenis' => 'suv',
             'status' => 'disewa',
-            'harga_sewa_per_hari' => 400000,
+            'harga_sewa_tanpa_sopir_per_hari' => 400000, 'harga_sewa_dengan_sopir_per_hari' => 400000,
             'is_approved' => true,
         ]);
 

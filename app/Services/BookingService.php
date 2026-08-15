@@ -17,7 +17,7 @@ class BookingService
         private readonly RevenueService $revenueService,
     ) {}
 
-    public function calculateTotalPrice(Vehicle $vehicle, string $tanggalMulai, string $tanggalSelesai, string $serviceType = 'rental', ?int $routeId = null, float $durationDays = 1): int
+    public function calculateTotalPrice(Vehicle $vehicle, string $tanggalMulai, string $tanggalSelesai, string $serviceType = 'rental', ?int $routeId = null, float $durationDays = 1, bool $withDriver = false): int
     {
         if ($serviceType === 'travel' && $routeId) {
             $route = Route::where('service_type', 'travel')->find($routeId);
@@ -27,10 +27,14 @@ class BookingService
 
         $days = (int) ceil($durationDays);
 
-        $total = $vehicle->harga_sewa_per_hari * $days;
+        $hargaPerHari = $withDriver
+            ? (int) ($vehicle->harga_sewa_dengan_sopir_per_hari ?? 0)
+            : (int) ($vehicle->harga_sewa_tanpa_sopir_per_hari ?? 0);
+
+        $total = $hargaPerHari * $days;
 
         if ($durationDays === 0.5) {
-            $total = (int) ceil($vehicle->harga_sewa_per_hari / 2);
+            $total = (int) ceil($hargaPerHari / 2);
         }
 
         return $total;
@@ -124,9 +128,15 @@ class BookingService
                     ->where('status', 'tersedia')
                     ->lockForUpdate()
                     ->findOrFail($vehicleId)
-                : new Vehicle(['harga_sewa_per_hari' => 0]);
+                : new Vehicle(['harga_sewa_tanpa_sopir_per_hari' => 0, 'harga_sewa_dengan_sopir_per_hari' => 0]);
 
             if ($serviceType === 'rental') {
+                if ($withDriver && ! $vehicle->sopir_id) {
+                    throw ValidationException::withMessages([
+                        'vehicle_id' => 'Kendaraan ini tidak memiliki sopir. Pilih opsi tanpa sopir atau pilih kendaraan lain yang sudah memiliki sopir.',
+                    ]);
+                }
+
                 if ($this->hasVehicleConflict($vehicle->id, $tanggalMulai, $tanggalSelesai)) {
                     throw ValidationException::withMessages([
                         'tanggal_mulai' => 'Unit ini sudah memiliki booking pada rentang tanggal yang dipilih.',
@@ -140,7 +150,7 @@ class BookingService
                 }
             }
 
-            $total = $this->calculateTotalPrice($vehicle, $tanggalMulai, $tanggalSelesai, $serviceType, $routeId, $durationDays);
+            $total = $this->calculateTotalPrice($vehicle, $tanggalMulai, $tanggalSelesai, $serviceType, $routeId, $durationDays, $withDriver);
 
             // Auto-assign vehicle and driver from route for travel service.
             $finalVehicleId = $vehicleId;

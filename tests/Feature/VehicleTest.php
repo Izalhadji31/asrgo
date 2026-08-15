@@ -23,7 +23,7 @@ class VehicleTest extends TestCase
             'kapasitas_penumpang' => 7,
             'prioritas_travel' => 2,
             'status' => 'tersedia',
-            'harga_sewa_per_hari' => 300000,
+            'harga_sewa_tanpa_sopir_per_hari' => 300000, 'harga_sewa_dengan_sopir_per_hari' => 300000,
             'foto' => UploadedFile::fake()->image('vehicle.jpg'),
         ]);
 
@@ -46,7 +46,7 @@ class VehicleTest extends TestCase
             'plat_nomor' => 'B 9999 ABC',
             'jenis' => 'suv',
             'status' => 'maintenance',
-            'harga_sewa_per_hari' => 450000,
+            'harga_sewa_tanpa_sopir_per_hari' => 450000, 'harga_sewa_dengan_sopir_per_hari' => 450000,
             'is_approved' => false,
         ]);
 
@@ -69,7 +69,7 @@ class VehicleTest extends TestCase
             'plat_nomor' => 'B 1111 AAA',
             'jenis' => 'MPV',
             'status' => 'tersedia',
-            'harga_sewa_per_hari' => 100000,
+            'harga_sewa_tanpa_sopir_per_hari' => 100000, 'harga_sewa_dengan_sopir_per_hari' => 100000,
             'is_approved' => true,
         ]);
         $secondVehicle = Vehicle::create([
@@ -78,7 +78,7 @@ class VehicleTest extends TestCase
             'plat_nomor' => 'B 2222 BBB',
             'jenis' => 'MPV',
             'status' => 'tersedia',
-            'harga_sewa_per_hari' => 100000,
+            'harga_sewa_tanpa_sopir_per_hari' => 100000, 'harga_sewa_dengan_sopir_per_hari' => 100000,
             'is_approved' => true,
         ]);
         $otherVehicle = Vehicle::create([
@@ -87,7 +87,7 @@ class VehicleTest extends TestCase
             'plat_nomor' => 'B 3333 CCC',
             'jenis' => 'MPV',
             'status' => 'tersedia',
-            'harga_sewa_per_hari' => 100000,
+            'harga_sewa_tanpa_sopir_per_hari' => 100000, 'harga_sewa_dengan_sopir_per_hari' => 100000,
             'is_approved' => true,
         ]);
 

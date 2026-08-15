@@ -24,7 +24,7 @@ class DashboardSummaryTest extends TestCase
             'plat_nomor' => 'ABC 1234',
             'jenis' => 'mobil',
             'status' => 'tersedia',
-            'harga_sewa_per_hari' => 150000,
+            'harga_sewa_tanpa_sopir_per_hari' => 150000, 'harga_sewa_dengan_sopir_per_hari' => 150000,
             'is_approved' => true,
         ]);
 

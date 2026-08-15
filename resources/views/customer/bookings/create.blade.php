@@ -529,7 +529,9 @@
                         'plat_nomor' => $v->plat_nomor,
                         'foto' => $v->foto ? Storage::url($v->foto) : '',
                         'jenis' => $v->jenis,
-                        'harga' => $v->harga_sewa_per_hari,
+                        'harga' => $v->harga_sewa_dengan_sopir_per_hari,
+                        'harga_tanpa_sopir' => $v->harga_sewa_tanpa_sopir_per_hari,
+                        'harga_dengan_sopir' => $v->harga_sewa_dengan_sopir_per_hari,
                     ];
                 @endphp
                 <div @click="$dispatch('pick-vehicle', @js($vehiclePickerData))"
@@ -552,7 +554,9 @@
                         <p class="mt-1 text-xs text-slate-500"><i class="fas fa-user-tie mr-1"></i>{{ $v->sopir->name }}</p>
                     @endif
                     <p class="mt-2 font-[IBM_Plex_Mono] text-base font-bold text-blue-900">
-                        Rp {{ number_format($v->harga_sewa_per_hari, 0, ',', '.') }} <span class="text-xs font-normal text-slate-400">/hari</span>
+                        Rp {{ number_format($v->harga_sewa_tanpa_sopir_per_hari, 0, ',', '.') }} <span class="text-xs font-normal text-slate-400">tanpa / hari</span>
+                        <span class="mx-1 text-slate-300" aria-hidden="true">/</span>
+                        Rp {{ number_format($v->harga_sewa_dengan_sopir_per_hari, 0, ',', '.') }} <span class="text-xs font-normal text-slate-400">dengan / hari</span>
                     </p>
                 </div>
                 @endforeach

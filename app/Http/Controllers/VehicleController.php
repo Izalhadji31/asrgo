@@ -48,9 +48,10 @@ class VehicleController extends Controller
 
     public function store(StoreVehicleRequest $request)
     {
-        $data = $request->only(['nama', 'plat_nomor', 'jenis', 'kapasitas_penumpang', 'prioritas_travel', 'status', 'harga_sewa_per_hari']);
+        $data = $request->only(['nama', 'plat_nomor', 'jenis', 'kapasitas_penumpang', 'prioritas_travel', 'status', 'harga_sewa_tanpa_sopir_per_hari', 'harga_sewa_dengan_sopir_per_hari']);
         $data['kapasitas_penumpang'] ??= 4;
         $data['prioritas_travel'] ??= 0;
+        $data['tarif_sopir_harian'] = $request->integer('tarif_sopir_harian', 150000);
         $data['mitra_id'] = Auth::id();
         $data['is_approved'] = false;
 
@@ -72,13 +73,14 @@ class VehicleController extends Controller
 
     public function update(UpdateVehicleRequest $request, Vehicle $vehicle)
     {
-        $fields = ['nama', 'plat_nomor', 'jenis', 'kapasitas_penumpang', 'status', 'harga_sewa_per_hari'];
+        $fields = ['nama', 'plat_nomor', 'jenis', 'kapasitas_penumpang', 'status', 'harga_sewa_tanpa_sopir_per_hari', 'harga_sewa_dengan_sopir_per_hari', 'tarif_sopir_harian'];
         if (Auth::user()->role === 'mitra') {
             $fields[] = 'prioritas_travel';
         }
 
         $data = $request->only($fields);
         $data['kapasitas_penumpang'] ??= $vehicle->kapasitas_penumpang ?: 4;
+        $data['tarif_sopir_harian'] ??= $vehicle->tarif_sopir_harian ?: 150000;
         if (Auth::user()->role === 'mitra') {
             $data['prioritas_travel'] ??= $vehicle->prioritas_travel ?: 0;
         }

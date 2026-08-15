@@ -121,7 +121,11 @@
                                     <td class="px-5 py-4">
                                         <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $status['class'] }}">{{ $status['label'] }}</span>
                                     </td>
-                                    <td class="px-5 py-4 font-[IBM_Plex_Mono] text-slate-700">Rp {{ number_format($vehicle->harga_sewa_per_hari, 0, ',', '.') }}</td>
+                                    <td class="px-5 py-4 font-[IBM_Plex_Mono] text-slate-700">
+                                        Rp {{ number_format($vehicle->harga_sewa_tanpa_sopir_per_hari, 0, ',', '.') }} <span class="text-xs text-slate-400">tanpa</span>
+                                        <span class="text-slate-300 mx-1" aria-hidden="true">/</span>
+                                        Rp {{ number_format($vehicle->harga_sewa_dengan_sopir_per_hari, 0, ',', '.') }} <span class="text-xs text-slate-400">dengan</span>
+                                    </td>
                                     <td class="px-5 py-4">
                                         @if ($vehicle->is_approved)
                                             <form action="{{ route('admin.vehicles.assign-driver', $vehicle) }}" method="POST" class="flex items-center gap-2">
