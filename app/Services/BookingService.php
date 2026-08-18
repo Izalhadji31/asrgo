@@ -285,6 +285,7 @@ class BookingService
     {
         $booking->update([
             'sopir_id' => $driverId,
+            'driver_confirmed_at' => null,
         ]);
 
         $this->notificationService->log(
@@ -298,7 +299,7 @@ class BookingService
         $this->notificationService->log(
             $driverId,
             'booking_assigned_driver',
-            'Anda memiliki booking baru yang ditugaskan.',
+            'Anda memiliki booking baru yang ditugaskan. Silakan konfirmasi di dashboard.',
             Booking::class,
             $booking->id
         );

@@ -99,15 +99,31 @@
                                 <td class="px-5 py-4 text-slate-600">{{ \Carbon\Carbon::parse($booking->tanggal_selesai)->format('d M Y') }}</td>
                                 <td class="px-5 py-4">
                                     <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $s['class'] }}">{{ $s['label'] }}</span>
+                                    @if ($booking->sopir_id === Auth::id() && ! $booking->driver_confirmed_at && ! in_array($booking->status, ['completed', 'cancelled'], true))
+                                        <span class="mt-1 block rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">Menunggu Konfirmasi</span>
+                                    @elseif ($booking->driver_confirmed_at)
+                                        <span class="mt-1 block rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">Dikonfirmasi</span>
+                                    @endif
                                 </td>
                                 <td class="px-5 py-4 font-[IBM_Plex_Mono] text-slate-700">Rp {{ number_format($booking->total_harga, 0, ',', '.') }}</td>
                                 <td class="px-5 py-4">
                                     <div class="flex items-center gap-2">
                                         @if ($booking->status !== 'completed' && $booking->status !== 'cancelled')
-                                        <form action="{{ route('bookings.complete', $booking) }}" method="POST">
-                                            @csrf
-                                            <button class="rounded-lg bg-green-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-green-700">Selesai</button>
-                                        </form>
+                                            @if (! $booking->driver_confirmed_at)
+                                            <form action="{{ route('driver.bookings.accept', $booking) }}" method="POST">
+                                                @csrf
+                                                <button class="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-emerald-700">Terima</button>
+                                            </form>
+                                            <form action="{{ route('driver.bookings.reject', $booking) }}" method="POST" onsubmit="return confirm('Tolak penugasan ini? Booking akan dikembalikan ke admin.')">
+                                                @csrf
+                                                <button class="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-50">Tolak</button>
+                                            </form>
+                                            @else
+                                            <form action="{{ route('bookings.complete', $booking) }}" method="POST">
+                                                @csrf
+                                                <button class="rounded-lg bg-green-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-green-700">Selesai</button>
+                                            </form>
+                                            @endif
                                         @else
                                             <span class="text-xs text-slate-400">—</span>
                                         @endif

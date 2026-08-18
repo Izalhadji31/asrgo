@@ -116,6 +116,8 @@ Route::middleware(['auth', 'role:driver'])->prefix('driver')->group(function () 
     Route::get('/dashboard', [DriverDashboardController::class, 'index'])->name('driver.dashboard');
     Route::post('/route-assignments/{routeAssignment}/vehicles/{vehicle}/depart', [DriverDashboardController::class, 'depart'])->name('driver.route-assignments.depart');
     Route::get('/bookings', [BookingController::class, 'index'])->name('driver.bookings.index');
+    Route::post('/bookings/{booking}/accept', [BookingController::class, 'acceptAssignment'])->name('driver.bookings.accept');
+    Route::post('/bookings/{booking}/reject', [BookingController::class, 'rejectAssignment'])->name('driver.bookings.reject');
 });
 
 Route::middleware(['auth', 'role:customer'])->prefix('customer')->group(function () {

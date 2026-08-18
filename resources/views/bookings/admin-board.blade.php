@@ -113,6 +113,11 @@
                                          @if ($booking->service_type === 'travel' && $booking->departed())
                                              <span class="rounded-full bg-teal-100 px-2 py-0.5 text-xs font-semibold text-teal-700">Sudah Berangkat</span>
                                          @endif
+                                         @if ($booking->sopir_id && ! $booking->driver_confirmed_at && ! in_array($booking->status, ['completed', 'cancelled'], true))
+                                             <span class="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">Menunggu konfirmasi sopir</span>
+                                         @elseif ($booking->sopir_id && $booking->driver_confirmed_at)
+                                             <span class="rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">Sopir dikonfirmasi</span>
+                                         @endif
                                      </div>
                                  </td>
                                  <td class="px-5 py-4">

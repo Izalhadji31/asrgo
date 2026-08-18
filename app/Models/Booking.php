@@ -50,6 +50,7 @@ class Booking extends Model
         'vehicle_id',
         'route_id',
         'sopir_id',
+        'driver_confirmed_at',
         'service_type',
         'session',
         'jumlah_penumpang',
@@ -99,6 +100,7 @@ class Booking extends Model
         'refund_requested_at' => 'datetime',
         'refund_reviewed_at' => 'datetime',
         'refunded_at' => 'datetime',
+        'driver_confirmed_at' => 'datetime',
     ];
 
     public function pelanggan()

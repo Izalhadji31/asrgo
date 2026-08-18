@@ -417,6 +417,7 @@ class BookingController extends Controller
         $booking->update([
             'vehicle_id' => $vehicle->id,
             'sopir_id' => $vehicle->sopir_id,
+            'driver_confirmed_at' => null,
         ]);
 
         AuditLog::record('assign_vehicle', 'Menugaskan kendaraan '.$vehicle->nama.' ke booking #'.$booking->id, Booking::class, $booking->id);
@@ -585,6 +586,59 @@ class BookingController extends Controller
         $this->bookingService->markCompleted($booking);
 
         return redirect()->back()->with('success', 'Booking selesai dan payout dibuat.');
+    }
+
+    public function acceptAssignment(Booking $booking)
+    {
+        if (Auth::user()->role !== 'driver' || $booking->sopir_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if (in_array($booking->status, [Booking::STATUS_CANCELLED, Booking::STATUS_COMPLETED], true)) {
+            return back()->withErrors(['booking' => 'Booking sudah selesai atau dibatalkan.']);
+        }
+
+        if (! $booking->driver_confirmed_at) {
+            $booking->update(['driver_confirmed_at' => now()]);
+
+            $this->notificationService->log(
+                $booking->pelanggan_id,
+                'driver_confirmed',
+                'Sopir '.Auth::user()->name.' menerima penugasan untuk booking Anda.',
+                Booking::class,
+                $booking->id
+            );
+        }
+
+        return back()->with('success', 'Penugasan diterima. Terima kasih.');
+    }
+
+    public function rejectAssignment(Booking $booking)
+    {
+        if (Auth::user()->role !== 'driver' || $booking->sopir_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if (in_array($booking->status, [Booking::STATUS_CANCELLED, Booking::STATUS_COMPLETED], true)) {
+            return back()->withErrors(['booking' => 'Booking sudah selesai atau dibatalkan.']);
+        }
+
+        $booking->update([
+            'sopir_id' => null,
+            'driver_confirmed_at' => null,
+        ]);
+
+        foreach (User::where('role', 'admin')->pluck('id') as $adminId) {
+            $this->notificationService->log(
+                $adminId,
+                'driver_rejected',
+                'Sopir '.Auth::user()->name.' menolak penugasan booking #'.$booking->id.'. Silakan assign sopir lain.',
+                Booking::class,
+                $booking->id
+            );
+        }
+
+        return back()->with('info', 'Penugasan ditolak. Booking dikembalikan ke admin untuk ditugaskan ulang.');
     }
 
     public function updateDetails(Request $request, Booking $booking)
