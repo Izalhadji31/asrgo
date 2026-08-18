@@ -247,6 +247,7 @@ class BookingValidationTest extends TestCase
             'tanggal_mulai' => $date,
             'session' => 'pagi',
             'jumlah_penumpang' => 1,
+            'passengers' => [['nama' => 'Penumpang Tes', 'no_hp' => '081234567890']],
         ]);
 
         $response->assertRedirect();
@@ -482,6 +483,7 @@ class BookingValidationTest extends TestCase
             'tanggal_mulai' => $date,
             'session' => 'pagi',
             'jumlah_penumpang' => 1,
+            'passengers' => [['nama' => 'Penumpang Tes', 'no_hp' => '081234567890']],
         ]);
 
         $response->assertRedirect();
@@ -497,6 +499,10 @@ class BookingValidationTest extends TestCase
             'tanggal_mulai' => $date,
             'session' => 'pagi',
             'jumlah_penumpang' => 2,
+            'passengers' => [
+                ['nama' => 'Penumpang Satu', 'no_hp' => '081111111111'],
+                ['nama' => 'Penumpang Dua', 'no_hp' => '082222222222'],
+            ],
         ]);
 
         $fullResponse->assertSessionHasErrors(['session']);
@@ -567,6 +573,7 @@ class BookingValidationTest extends TestCase
             'tanggal_mulai' => $date,
             'session' => 'pagi',
             'jumlah_penumpang' => 1,
+            'passengers' => [['nama' => 'Penumpang Tes', 'no_hp' => '081234567890']],
         ]);
 
         $response->assertRedirect();
