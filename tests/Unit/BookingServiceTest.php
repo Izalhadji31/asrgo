@@ -210,7 +210,7 @@ class BookingServiceTest extends TestCase
             'is_approved' => true,
         ]);
 
-        $booking = $this->bookingService->createBooking($customer->id, $vehicle->id, '2026-11-01', '2026-11-03', durationDays: 3);
+        $booking = $this->bookingService->createBooking($customer->id, $vehicle->id, '2026-11-01', '2026-11-03', durationDays: 3, withDriver: false);
 
         $this->assertInstanceOf(Booking::class, $booking);
         $this->assertSame('pending', $booking->status);

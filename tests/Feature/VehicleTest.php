@@ -5,7 +5,6 @@ namespace Tests\Feature;
 use App\Models\User;
 use App\Models\Vehicle;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 class VehicleTest extends TestCase
@@ -24,7 +23,6 @@ class VehicleTest extends TestCase
             'prioritas_travel' => 2,
             'status' => 'tersedia',
             'harga_sewa_tanpa_sopir_per_hari' => 300000, 'harga_sewa_dengan_sopir_per_hari' => 300000,
-            'foto' => UploadedFile::fake()->image('vehicle.jpg'),
         ]);
 
         $response->assertRedirect(route('vehicles.index'));
