@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreVehicleRequest;
 use App\Http\Requests\UpdateVehicleRequest;
+use App\Models\AuditLog;
 use App\Models\Vehicle;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -116,6 +117,8 @@ class VehicleController extends Controller
 
         $vehicle->update(['is_approved' => true]);
 
+        AuditLog::record('approve_vehicle', 'Menyetujui kendaraan '.$vehicle->nama, Vehicle::class, $vehicle->id);
+
         return redirect()->route('admin.vehicles.index')->with('success', 'Unit kendaraan berhasil disetujui.');
     }
 
@@ -138,6 +141,8 @@ class VehicleController extends Controller
         }
 
         $vehicle->update(['sopir_id' => $sopirId]);
+
+        AuditLog::record('assign_driver_vehicle', 'Menugaskan sopir ke kendaraan '.$vehicle->nama, Vehicle::class, $vehicle->id);
 
         return back()->with('success', 'Sopir berhasil ditugaskan ke kendaraan.');
     }

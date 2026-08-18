@@ -38,6 +38,7 @@
                         <th class="px-5 py-3 font-medium">Unit</th>
                         <th class="px-5 py-3 font-medium">Rating</th>
                         <th class="px-5 py-3 font-medium">Komentar</th>
+                        <th class="px-5 py-3 font-medium">Aksi</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -58,10 +59,17 @@
                                 <span class="font-medium text-[#E8A33D]">{{ str_repeat('★', $review->rating) }}</span><span class="text-slate-300">{{ str_repeat('★', 5 - $review->rating) }}</span>
                             </td>
                             <td class="max-w-xs px-5 py-4 text-slate-600">{{ $review->komentar ?? '-' }}</td>
+                            <td class="px-5 py-4">
+                                <form action="{{ route('admin.reviews.destroy', $review) }}" method="POST" onsubmit="return confirm('Hapus ulasan ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-50">Hapus</button>
+                                </form>
+                            </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="px-5 py-12 text-center text-sm text-slate-500">Belum ada ulasan dari pelanggan.</td>
+                            <td colspan="8" class="px-5 py-12 text-center text-sm text-slate-500">Belum ada ulasan dari pelanggan.</td>
                         </tr>
                     @endforelse
                 </tbody>

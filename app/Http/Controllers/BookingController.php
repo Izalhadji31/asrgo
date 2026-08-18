@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\AssignDriverRequest;
 use App\Http\Requests\StoreBookingRequest;
+use App\Models\AuditLog;
 use App\Models\Booking;
 use App\Models\Route;
 use App\Models\TravelDeparture;
@@ -266,6 +267,8 @@ class BookingController extends Controller
 
         $this->bookingService->assignDriver($booking, $request->sopir_id);
 
+        AuditLog::record('assign_driver', 'Menugaskan sopir ke booking #'.$booking->id, Booking::class, $booking->id);
+
         $redirectRoute = Auth::user()->role === 'admin'
             ? route('admin.bookings.index')
             : route('bookings.index');
@@ -298,6 +301,8 @@ class BookingController extends Controller
             'sopir_id' => $vehicle->sopir_id,
         ]);
 
+        AuditLog::record('assign_vehicle', 'Menugaskan kendaraan '.$vehicle->nama.' ke booking #'.$booking->id, Booking::class, $booking->id);
+
         return back()->with('success', 'Kendaraan berhasil ditugaskan ke booking.');
     }
 
@@ -326,6 +331,8 @@ class BookingController extends Controller
             'ticket_number' => 'TKT-'.strtoupper(uniqid()),
             'ticket_status' => Booking::TICKET_CREATED,
         ]);
+
+        AuditLog::record('generate_ticket', 'Membuat tiket '.$booking->ticket_number.' untuk booking #'.$booking->id, Booking::class, $booking->id);
 
         return back()->with('success', 'Tiket berhasil dibuat.');
     }
@@ -390,6 +397,8 @@ class BookingController extends Controller
             return back()->withErrors(['refund' => $exception->getMessage()]);
         }
 
+        AuditLog::record('approve_refund', 'Menyetujui refund booking #'.$booking->id, Booking::class, $booking->id);
+
         return back()->with('success', 'Refund disetujui dan sudah diajukan ke Midtrans.');
     }
 
@@ -414,6 +423,8 @@ class BookingController extends Controller
             Booking::class,
             $booking->id
         );
+
+        AuditLog::record('reject_refund', 'Menolak refund booking #'.$booking->id, Booking::class, $booking->id);
 
         return back()->with('success', 'Pengajuan refund ditolak.');
     }
@@ -472,6 +483,8 @@ class BookingController extends Controller
             'payment_scheme' => Booking::PAYMENT_SCHEME_FULL,
             'payment_paid_at' => now(),
         ])->save();
+
+        AuditLog::record('mark_paid', 'Menandai lunas booking #'.$booking->id, Booking::class, $booking->id);
 
         $this->notificationService->log(
             $booking->pelanggan_id,

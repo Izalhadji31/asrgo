@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AuditLog;
 use App\Models\Booking;
+use App\Models\NotificationLog;
 use App\Models\Review;
 use App\Models\User;
 use App\Services\NotificationService;
@@ -61,5 +63,24 @@ class ReviewController extends Controller
             ->withQueryString();
 
         return view('admin.reviews.index', compact('reviews', 'totalReviews', 'avgRating'));
+    }
+
+    public function destroy(Review $review)
+    {
+        if (Auth::user()->role !== 'admin') {
+            abort(403);
+        }
+
+        NotificationLog::where('related_model', Review::class)
+            ->where('related_id', $review->id)
+            ->delete();
+
+        $reviewId = $review->id;
+        $bookingId = $review->booking_id;
+        $review->delete();
+
+        AuditLog::record('delete_review', 'Menghapus ulasan #'.$reviewId.' untuk booking #'.$bookingId, Review::class, $reviewId);
+
+        return back()->with('success', 'Ulasan berhasil dihapus.');
     }
 }

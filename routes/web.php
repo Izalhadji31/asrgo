@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminDashboardController;
+use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\BookingController;
 use App\Http\Controllers\CustomerDashboardController;
 use App\Http\Controllers\DriverDashboardController;
@@ -67,6 +68,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/financial-reports', [FinancialReportController::class, 'index'])->name('admin.reports.index');
     Route::get('/financial-reports/cetak', [FinancialReportController::class, 'printReport'])->name('admin.reports.print');
     Route::get('/reviews', [ReviewController::class, 'index'])->name('admin.reviews.index');
+    Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('admin.reviews.destroy');
+    Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('admin.audit-logs.index');
     Route::post('/bookings/{booking}/assign-driver', [BookingController::class, 'assignDriver'])->name('admin.bookings.assign-driver');
     Route::post('/bookings/{booking}/assign-vehicle', [BookingController::class, 'assignVehicle'])->name('admin.bookings.assign-vehicle');
     Route::post('/bookings/{booking}/generate-ticket', [BookingController::class, 'generateTicket'])->name('admin.bookings.generate-ticket');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AuditLog;
 use App\Models\Payout;
 use App\Models\RevenueShare;
 use Illuminate\Support\Facades\Auth;
@@ -44,6 +45,8 @@ class FinancialReportController extends Controller
         $this->authorize('update', $payout);
 
         $payout->update(['status_pencairan' => 'paid']);
+
+        AuditLog::record('payout_paid', 'Mencairkan payout #'.$payout->id.' untuk booking #'.$payout->booking_id, Payout::class, $payout->id);
 
         return redirect()->route('admin.reports.index')->with('success', 'Payout #'.$payout->id.' berhasil ditandai sebagai lunas.');
     }
