@@ -105,6 +105,9 @@
                                             @case('completed') bg-[#3F7D6C] @break
                                             @default bg-[#C1443C] @endswitch"></span>
                                          <span class="text-slate-600">{{ $statusLabels[$booking->status] ?? $booking->status }}</span>
+                                         @if ($booking->service_type === 'travel' && $booking->departed())
+                                             <span class="rounded-full bg-teal-100 px-2 py-0.5 text-xs font-semibold text-teal-700">Sudah Berangkat</span>
+                                         @endif
                                      </div>
                                  </td>
                                  <td class="px-5 py-4">

@@ -53,7 +53,8 @@ class BookingPolicy
             && $user->id === $booking->pelanggan_id
             && $booking->payment_status === Booking::PAYMENT_PAID
             && $booking->refund_status === Booking::REFUND_NONE
-            && ! in_array($booking->status, [Booking::STATUS_COMPLETED, Booking::STATUS_CANCELLED], true);
+            && ! in_array($booking->status, [Booking::STATUS_COMPLETED, Booking::STATUS_CANCELLED], true)
+            && ! $booking->departed();
     }
 
     public function approveRefund(User $user, Booking $booking): bool

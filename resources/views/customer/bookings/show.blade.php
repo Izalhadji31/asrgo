@@ -21,13 +21,17 @@
         : ['label' => 'Rental', 'class' => 'bg-blue-100 text-blue-700'];
     $s = $statusLabels[$booking->status] ?? ['label' => $booking->status, 'class' => 'bg-slate-100 text-slate-700'];
 
+    $dep = $booking->departed();
     $steps = [
         ['label' => 'Booking Dibuat', 'done' => true, 'time' => $booking->created_at?->translatedFormat('d M Y, H:i')],
         ['label' => 'Pembayaran Diterima', 'done' => $booking->payment_status === 'paid', 'time' => $booking->payment_paid_at?->translatedFormat('d M Y, H:i')],
         ['label' => 'Sopir Ditugaskan', 'done' => in_array($booking->status, ['sopir_assigned', 'completed'], true), 'time' => null],
         ['label' => 'Tiket Dibuat', 'done' => (bool) $booking->ticket_number, 'time' => null],
-        ['label' => $booking->status === 'cancelled' ? 'Dibatalkan' : 'Selesai', 'done' => in_array($booking->status, ['completed', 'cancelled'], true), 'time' => null],
     ];
+    if ($booking->service_type === 'travel') {
+        $steps[] = ['label' => 'Kendaraan Berangkat', 'done' => (bool) $dep, 'time' => $dep?->departed_at?->translatedFormat('d M Y, H:i')];
+    }
+    $steps[] = ['label' => $booking->status === 'cancelled' ? 'Dibatalkan' : 'Selesai', 'done' => in_array($booking->status, ['completed', 'cancelled'], true), 'time' => null];
 @endphp
 
 <div class="space-y-6">
@@ -50,6 +54,9 @@
                 <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $s['class'] }}">{{ $s['label'] }}</span>
                 @if ($booking->session)
                     <span class="rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-700">{{ $booking->session === 'pagi' ? 'Pagi (08:00)' : 'Siang (12:00)' }}</span>
+                @endif
+                @if ($dep)
+                    <span class="rounded-full bg-teal-100 px-3 py-1 text-xs font-semibold text-teal-700">Sudah Berangkat</span>
                 @endif
             </div>
 
@@ -149,7 +156,7 @@
                 <a href="{{ route('ticket.show', $booking) }}" class="rounded-lg border border-[#3F7D6C] px-4 py-2 text-sm font-medium text-[#3F7D6C] transition hover:bg-[#3F7D6C] hover:text-white">Lihat Tiket</a>
             @endif
 
-            @if (in_array($booking->status, ['pending', 'sopir_assigned'], true) && $booking->payment_status === 'paid' && $booking->refund_status === 'none')
+            @if (in_array($booking->status, ['pending', 'sopir_assigned'], true) && $booking->payment_status === 'paid' && $booking->refund_status === 'none' && ! $dep)
                 <details class="text-left">
                     <summary class="cursor-pointer rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-600">Ajukan Refund</summary>
                     <form action="{{ route('bookings.refund.request', $booking) }}" method="POST" class="mt-2 w-80 space-y-2 rounded-lg border border-red-100 bg-red-50 p-3">

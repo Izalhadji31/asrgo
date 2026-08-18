@@ -120,6 +120,20 @@ class Booking extends Model
         return $this->hasOne(Review::class);
     }
 
+    public function departed(): ?TravelDeparture
+    {
+        if ($this->service_type !== 'travel' || ! $this->route_id || ! $this->vehicle_id) {
+            return null;
+        }
+
+        return TravelDeparture::where('route_id', $this->route_id)
+            ->where('vehicle_id', $this->vehicle_id)
+            ->whereDate('departure_date', $this->tanggal_mulai)
+            ->where('session', $this->session)
+            ->latest('departed_at')
+            ->first();
+    }
+
     public function payout()
     {
         return $this->hasOne(Payout::class);
