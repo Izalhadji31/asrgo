@@ -48,6 +48,28 @@ class MitraDashboardController extends Controller
             'count' => Payout::where('mitra_id', $mitraId)->count(),
         ];
 
-        return view('mitra.payouts.index', compact('payouts', 'stats'));
+        $unitStats = Vehicle::where('mitra_id', $mitraId)
+            ->get()
+            ->map(function ($vehicle) use ($mitraId) {
+                $total = (float) Payout::where('mitra_id', $mitraId)
+                    ->whereHas('booking', fn ($query) => $query->where('vehicle_id', $vehicle->id))
+                    ->sum('jumlah_mitra');
+
+                $bookings = (int) Booking::where('vehicle_id', $vehicle->id)
+                    ->where('status', Booking::STATUS_COMPLETED)
+                    ->count();
+
+                return [
+                    'nama' => $vehicle->nama,
+                    'plat' => $vehicle->plat_nomor,
+                    'status' => $vehicle->status,
+                    'bookings' => $bookings,
+                    'total' => $total,
+                ];
+            })
+            ->sortByDesc('total')
+            ->values();
+
+        return view('mitra.payouts.index', compact('payouts', 'stats', 'unitStats'));
     }
 }

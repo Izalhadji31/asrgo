@@ -32,6 +32,47 @@
         </article>
     </section>
 
+    <section class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <h2 class="font-[Barlow_Condensed] text-2xl font-semibold text-blue-900">Performa Unit</h2>
+        <p class="text-sm text-slate-500">Pendapatan per kendaraan dari booking selesai — urut dari yang tertinggi.</p>
+        <div class="mt-4 overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-200 text-sm">
+                <thead class="bg-slate-50 text-left text-slate-500">
+                    <tr>
+                        <th class="px-5 py-3 font-medium">Unit</th>
+                        <th class="px-5 py-3 font-medium">Plat Nomor</th>
+                        <th class="px-5 py-3 font-medium">Booking Selesai</th>
+                        <th class="px-5 py-3 font-medium">Total Pendapatan</th>
+                        <th class="px-5 py-3 font-medium">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @forelse ($unitStats as $unit)
+                        <tr class="odd:bg-white even:bg-slate-50/50">
+                            <td class="px-5 py-4 font-medium text-slate-800">{{ $unit['nama'] }}</td>
+                            <td class="px-5 py-4 font-[IBM_Plex_Mono] text-slate-600">{{ $unit['plat'] }}</td>
+                            <td class="px-5 py-4 text-slate-700">{{ $unit['bookings'] }} booking</td>
+                            <td class="px-5 py-4 font-[IBM_Plex_Mono] text-slate-700">Rp {{ number_format($unit['total'], 0, ',', '.') }}</td>
+                            <td class="px-5 py-4">
+                                @if ($unit['status'] === 'tersedia')
+                                    <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">Tersedia</span>
+                                @elseif ($unit['status'] === 'disewa')
+                                    <span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">Disewa</span>
+                                @else
+                                    <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">{{ ucfirst($unit['status']) }}</span>
+                                @endif
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="5" class="px-5 py-12 text-center text-sm text-slate-500">Belum ada data unit.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </section>
+
     <div class="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
         <div class="border-b border-slate-200 px-5 py-4">
             <h2 class="font-[Barlow_Condensed] text-2xl font-semibold text-blue-900">Riwayat Payout</h2>
