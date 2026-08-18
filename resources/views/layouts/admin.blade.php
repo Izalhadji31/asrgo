@@ -40,6 +40,7 @@
                     ['label' => 'Kelola Sopir', 'icon' => 'fa-solid fa-user-tie', 'route' => 'admin.drivers.index', 'active' => ['admin.drivers.index', 'admin.drivers.*']],
                     ['label' => 'Bagi Hasil', 'icon' => 'fa-solid fa-coins', 'route' => 'admin.revenue-shares.index', 'active' => ['admin.revenue-shares.index', 'admin.revenue-shares.*']],
                     ['label' => 'Laporan Keuangan', 'icon' => 'fa-solid fa-file-invoice-dollar', 'route' => 'admin.reports.index', 'active' => ['admin.reports.index']],
+                    ['label' => 'Ulasan', 'icon' => 'fa-solid fa-star', 'route' => 'admin.reviews.index', 'active' => ['admin.reviews.index']],
                     ['label' => 'Notifikasi', 'icon' => 'fa-solid fa-bell', 'route' => 'notifications.index', 'active' => ['notifications.*']],
                 ];
                 @endphp

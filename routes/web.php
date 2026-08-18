@@ -12,6 +12,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RevenueShareController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\RouteController;
 use App\Http\Controllers\VehicleController;
 use Illuminate\Support\Facades\Auth;
@@ -65,6 +66,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::post('/drivers', [DriverManagementController::class, 'store'])->name('admin.drivers.store');
     Route::get('/financial-reports', [FinancialReportController::class, 'index'])->name('admin.reports.index');
     Route::get('/financial-reports/cetak', [FinancialReportController::class, 'printReport'])->name('admin.reports.print');
+    Route::get('/reviews', [ReviewController::class, 'index'])->name('admin.reviews.index');
     Route::post('/bookings/{booking}/assign-driver', [BookingController::class, 'assignDriver'])->name('admin.bookings.assign-driver');
     Route::post('/bookings/{booking}/assign-vehicle', [BookingController::class, 'assignVehicle'])->name('admin.bookings.assign-vehicle');
     Route::post('/bookings/{booking}/generate-ticket', [BookingController::class, 'generateTicket'])->name('admin.bookings.generate-ticket');
@@ -114,6 +116,7 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->group(function
     Route::get('/bookings/{booking}/payment', [PaymentController::class, 'show'])->name('payments.show');
     Route::get('/bookings/{booking}/payment/status', [PaymentController::class, 'status'])->name('payments.status');
     Route::post('/bookings/{booking}/refund-request', [BookingController::class, 'requestRefund'])->name('bookings.refund.request');
+    Route::post('/bookings/{booking}/review', [ReviewController::class, 'store'])->name('bookings.review');
 });
 
 require __DIR__.'/auth.php';

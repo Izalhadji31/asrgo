@@ -115,6 +115,11 @@ class Booking extends Model
         return $this->belongsTo(User::class, 'sopir_id');
     }
 
+    public function review()
+    {
+        return $this->hasOne(Review::class);
+    }
+
     public function payout()
     {
         return $this->hasOne(Payout::class);

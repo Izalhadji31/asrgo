@@ -183,11 +183,40 @@
                                              <span class="text-xs text-slate-400">Menunggu tiket</span>
                                          @endif
                                      @else
-                                         @if ($booking->ticket_number)
-                                             <a href="{{ route('ticket.show', $booking) }}" class="rounded-lg border border-[#3F7D6C] px-3 py-1.5 text-xs font-medium text-[#3F7D6C] transition hover:bg-[#3F7D6C] hover:text-white">Lihat Tiket</a>
-                                         @else
-                                             <span class="text-xs text-slate-400">—</span>
-                                         @endif
+                                         <div class="space-y-2">
+                                             @if ($booking->ticket_number)
+                                                 <a href="{{ route('ticket.show', $booking) }}" class="inline-flex rounded-lg border border-[#3F7D6C] px-3 py-1.5 text-xs font-medium text-[#3F7D6C] transition hover:bg-[#3F7D6C] hover:text-white">Lihat Tiket</a>
+                                             @endif
+                                             @if ($booking->status === 'completed')
+                                                 @if ($booking->review)
+                                                     <span class="inline-flex items-center gap-1 text-xs font-medium text-[#E8A33D]">
+                                                         <span>{{ str_repeat('★', $booking->review->rating) }}</span><span class="text-slate-300">{{ str_repeat('★', 5 - $booking->review->rating) }}</span>
+                                                         @if ($booking->review->komentar)
+                                                             <span class="ml-1 max-w-[10rem] truncate text-slate-400" title="{{ $booking->review->komentar }}">{{ $booking->review->komentar }}</span>
+                                                         @endif
+                                                     </span>
+                                                 @else
+                                                     <details class="text-left">
+                                                         <summary class="cursor-pointer text-xs font-medium text-[#E8A33D]">Beri Ulasan</summary>
+                                                         <form action="{{ route('bookings.review', $booking) }}" method="POST" class="mt-2 space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
+                                                             @csrf
+                                                             <div class="flex items-center gap-1">
+                                                                 @for ($i = 1; $i <= 5; $i++)
+                                                                 <label class="cursor-pointer">
+                                                                     <input type="radio" name="rating" value="{{ $i }}" class="peer sr-only" required>
+                                                                     <span class="text-xl text-slate-300 transition peer-checked:text-[#E8A33D]">★</span>
+                                                                 </label>
+                                                                 @endfor
+                                                             </div>
+                                                             <textarea name="komentar" rows="2" maxlength="1000" class="w-full rounded-lg border border-amber-200 px-2 py-1.5 text-xs text-slate-700" placeholder="Komentar (opsional, maksimal 1000 karakter)"></textarea>
+                                                             <button type="submit" class="rounded-lg bg-[#E8A33D] px-3 py-1.5 text-xs font-semibold text-blue-900 transition hover:opacity-90">Kirim Ulasan</button>
+                                                         </form>
+                                                     </details>
+                                                 @endif
+                                             @else
+                                                 <span class="text-xs text-slate-400">—</span>
+                                             @endif
+                                         </div>
                                      @endif
                                 </td>
                             </tr>

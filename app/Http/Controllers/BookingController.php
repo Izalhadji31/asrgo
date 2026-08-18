@@ -30,7 +30,7 @@ class BookingController extends Controller
 
     public function index()
     {
-        $bookings = Booking::with(['vehicle', 'pelanggan', 'sopir'])->latest();
+        $bookings = Booking::with(['vehicle', 'pelanggan', 'sopir', 'review'])->latest();
 
         if (Auth::user()->role === 'customer') {
             $bookings = $bookings->where('pelanggan_id', Auth::id());

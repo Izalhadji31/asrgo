@@ -69,4 +69,12 @@ class BookingPolicy
         return $user->role === 'admin'
             && $booking->refund_status === Booking::REFUND_REQUESTED;
     }
+
+    public function review(User $user, Booking $booking): bool
+    {
+        return $user->role === 'customer'
+            && $user->id === $booking->pelanggan_id
+            && $booking->status === Booking::STATUS_COMPLETED
+            && ! $booking->review()->exists();
+    }
 }
