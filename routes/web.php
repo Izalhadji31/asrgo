@@ -64,6 +64,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/drivers', [DriverManagementController::class, 'index'])->name('admin.drivers.index');
     Route::post('/drivers', [DriverManagementController::class, 'store'])->name('admin.drivers.store');
     Route::get('/financial-reports', [FinancialReportController::class, 'index'])->name('admin.reports.index');
+    Route::get('/financial-reports/cetak', [FinancialReportController::class, 'printReport'])->name('admin.reports.print');
     Route::post('/bookings/{booking}/assign-driver', [BookingController::class, 'assignDriver'])->name('admin.bookings.assign-driver');
     Route::post('/bookings/{booking}/assign-vehicle', [BookingController::class, 'assignVehicle'])->name('admin.bookings.assign-vehicle');
     Route::post('/bookings/{booking}/generate-ticket', [BookingController::class, 'generateTicket'])->name('admin.bookings.generate-ticket');

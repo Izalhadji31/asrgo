@@ -36,7 +36,10 @@
                 <h1 class="font-[Barlow_Condensed] text-3xl font-semibold text-blue-900">Laporan Keuangan</h1>
                 <p class="text-sm text-slate-500">Ringkasan pendapatan, payout, dan status pencairan sistem.</p>
             </div>
-            <a href="{{ route('admin.dashboard') }}" class="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-[#E8A33D]">Kembali ke Ringkasan</a>
+            <div class="flex items-center gap-2">
+                <a href="{{ route('admin.reports.print') }}" target="_blank" class="rounded-lg bg-blue-900 px-3 py-2 text-sm font-medium text-white transition hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-[#E8A33D]">Cetak PDF</a>
+                <a href="{{ route('admin.dashboard') }}" class="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-[#E8A33D]">Kembali ke Ringkasan</a>
+            </div>
         </div>
 
         <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
