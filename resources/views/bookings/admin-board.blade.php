@@ -75,6 +75,7 @@
                 </select>
             </div>
             <button class="rounded-lg bg-blue-900 px-4 py-2 text-sm font-semibold text-white">Terapkan Filter</button>
+            <a href="{{ route('admin.bookings.export', request()->query()) }}" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100">Export CSV</a>
             @if ($activePaymentStatus)
                 <a href="{{ route('admin.bookings.index') }}" class="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-600">Reset</a>
             @endif

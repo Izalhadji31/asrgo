@@ -49,6 +49,92 @@ class BookingController extends Controller
         ]);
     }
 
+    public function exportCsv(Request $request)
+    {
+        if (Auth::user()->role !== 'admin') {
+            abort(403);
+        }
+
+        $query = Booking::with(['vehicle', 'pelanggan', 'sopir'])->latest();
+
+        $ticketStatus = $request->query('ticket_status');
+        $ticketStatus = in_array($ticketStatus, [Booking::TICKET_NOT_CREATED, Booking::TICKET_CREATED], true)
+            ? $ticketStatus
+            : null;
+        $paymentStatus = $request->query('payment_status');
+        $paymentStatus = in_array($paymentStatus, [
+            Booking::PAYMENT_UNPAID,
+            Booking::PAYMENT_PENDING,
+            Booking::PAYMENT_PAID,
+            Booking::PAYMENT_FAILED,
+            Booking::PAYMENT_EXPIRED,
+        ], true) ? $paymentStatus : null;
+        $search = trim((string) $request->query('q', ''));
+
+        $bookings = $query
+            ->when($ticketStatus, fn ($q) => $q->where('ticket_status', $ticketStatus))
+            ->when($paymentStatus, fn ($q) => $q->where('payment_status', $paymentStatus))
+            ->when($search !== '', function ($q) use ($search) {
+                $q->where(function ($q2) use ($search) {
+                    $q2->where('id', 'like', "%{$search}%")
+                        ->orWhere('ticket_number', 'like', "%{$search}%")
+                        ->orWhereHas('pelanggan', fn ($p) => $p->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"))
+                        ->orWhereHas('vehicle', fn ($v) => $v->where('nama', 'like', "%{$search}%")->orWhere('plat_nomor', 'like', "%{$search}%"));
+                });
+            })
+            ->get();
+
+        $statusLabels = [
+            'pending' => 'Menunggu',
+            'sopir_assigned' => 'Sopir Ditugaskan',
+            'completed' => 'Selesai',
+            'cancelled' => 'Dibatalkan',
+        ];
+        $paymentLabels = [
+            'unpaid' => 'Belum Dibayar',
+            'pending' => 'Menunggu Pembayaran',
+            'paid' => 'Lunas',
+            'failed' => 'Gagal',
+            'expired' => 'Kedaluwarsa',
+        ];
+
+        AuditLog::record('export_bookings', 'Export CSV '.count($bookings).' booking');
+
+        $filename = 'booking-'.now()->format('Ymd-His').'.csv';
+
+        return response()->streamDownload(function () use ($bookings, $statusLabels, $paymentLabels) {
+            $handle = fopen('php://output', 'w');
+            fputs($handle, "\xEF\xBB\xBF");
+            fputcsv($handle, [
+                'ID', 'Layanan', 'Customer', 'Email', 'Kendaraan', 'Plat',
+                'Sopir', 'Tanggal Mulai', 'Tanggal Selesai', 'Total (Rp)',
+                'Status', 'No. Tiket', 'Pembayaran', 'Skema', 'Nominal Dibayar (Rp)',
+            ]);
+
+            foreach ($bookings as $booking) {
+                fputcsv($handle, [
+                    $booking->id,
+                    $booking->service_type === 'travel' ? 'Travel' : 'Rental',
+                    $booking->pelanggan?->name ?? '-',
+                    $booking->pelanggan?->email ?? '-',
+                    $booking->vehicle?->nama ?? '-',
+                    $booking->vehicle?->plat_nomor ?? '-',
+                    $booking->sopir?->name ?? '-',
+                    $booking->tanggal_mulai,
+                    $booking->tanggal_selesai,
+                    (int) $booking->total_harga,
+                    $statusLabels[$booking->status] ?? $booking->status,
+                    $booking->ticket_number ?? '-',
+                    $paymentLabels[$booking->payment_status] ?? $booking->payment_status,
+                    $booking->payment_scheme === 'dp' ? 'DP 30%' : 'Lunas Penuh',
+                    (int) ($booking->payment_amount ?? 0),
+                ]);
+            }
+
+            fclose($handle);
+        }, $filename, ['Content-Type' => 'text/csv']);
+    }
+
     public function adminBoard(Request $request)
     {
         $bookingsQuery = Booking::with(['vehicle', 'pelanggan', 'sopir', 'passengers'])->latest();

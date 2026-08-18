@@ -61,6 +61,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/bookings', [BookingController::class, 'adminBoard'])->name('admin.bookings.index');
+    Route::get('/bookings/export', [BookingController::class, 'exportCsv'])->name('admin.bookings.export');
     Route::get('/vehicles', [VehicleController::class, 'index'])->name('admin.vehicles.index');
     Route::post('/vehicles/{vehicle}/approve', [VehicleController::class, 'approve'])->name('admin.vehicles.approve');
     Route::post('/vehicles/{vehicle}/assign-driver', [VehicleController::class, 'assignDriver'])->name('admin.vehicles.assign-driver');
