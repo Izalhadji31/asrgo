@@ -82,6 +82,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::post('/bookings/{booking}/refund/reject', [BookingController::class, 'rejectRefund'])->name('admin.bookings.refund.reject');
     Route::post('/bookings/{booking}/mark-paid', [BookingController::class, 'markAsFullyPaid'])->name('admin.bookings.mark-paid');
     Route::post('/bookings/{booking}/cancel', [BookingController::class, 'adminCancel'])->name('admin.bookings.cancel');
+    Route::post('/bookings/{booking}/update', [BookingController::class, 'updateDetails'])->name('admin.bookings.update');
     Route::get('/mitras', [MitraManagementController::class, 'index'])->name('admin.mitras.index');
     Route::post('/mitras', [MitraManagementController::class, 'store'])->name('admin.mitras.store');
     Route::get('/revenue-shares', [RevenueShareController::class, 'index'])->name('admin.revenue-shares.index');

@@ -587,6 +587,41 @@ class BookingController extends Controller
         return redirect()->back()->with('success', 'Booking selesai dan payout dibuat.');
     }
 
+    public function updateDetails(Request $request, Booking $booking)
+    {
+        if (Auth::user()->role !== 'admin') {
+            abort(403);
+        }
+
+        if ($booking->service_type !== 'rental' || in_array($booking->status, [Booking::STATUS_COMPLETED, Booking::STATUS_CANCELLED], true)) {
+            return back()->withErrors(['booking' => 'Detail hanya dapat diubah untuk booking rental yang belum selesai atau dibatalkan.']);
+        }
+
+        $validated = $request->validate([
+            'tanggal_mulai' => ['required', 'date'],
+            'tanggal_selesai' => ['required', 'date', 'after_or_equal:tanggal_mulai'],
+            'total_harga' => ['required', 'integer', 'min:1'],
+            'contact_hp' => ['nullable', 'string', 'max:20'],
+            'notes' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        if ($booking->vehicle_id
+            && $this->bookingService->hasVehicleConflict($booking->vehicle_id, $validated['tanggal_mulai'], $validated['tanggal_selesai'], $booking->id)) {
+            return back()->withErrors(['tanggal_mulai' => 'Unit ini sudah memiliki booking pada rentang tanggal baru tersebut.'])->withInput();
+        }
+
+        if ($booking->sopir_id
+            && $this->bookingService->hasDriverConflict($booking->sopir_id, $validated['tanggal_mulai'], $validated['tanggal_selesai'], $booking->id)) {
+            return back()->withErrors(['tanggal_mulai' => 'Sopir ini sedang bertugas pada rentang tanggal baru tersebut.'])->withInput();
+        }
+
+        $booking->update($validated);
+
+        AuditLog::record('update_booking', 'Mengubah detail booking #'.$booking->id, Booking::class, $booking->id);
+
+        return back()->with('success', 'Detail booking #'.$booking->id.' berhasil diperbarui.');
+    }
+
     public function adminCancel(Booking $booking)
     {
         if (Auth::user()->role !== 'admin') {

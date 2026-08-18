@@ -439,6 +439,38 @@
                           <button class="w-full rounded-lg bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700">Batalkan Booking</button>
                       </form>
                       @endif
+
+                      @if ($booking->service_type === 'rental' && !in_array($booking->status, ['completed', 'cancelled'], true))
+                      <details class="rounded-lg border border-slate-200 bg-slate-50 p-4">
+                          <summary class="cursor-pointer text-sm font-semibold text-slate-700">Edit Detail Booking</summary>
+                          <form action="{{ route('admin.bookings.update', $booking) }}" method="POST" class="mt-3 space-y-3">
+                              @csrf
+                              <div class="grid gap-3 sm:grid-cols-2">
+                                  <div>
+                                      <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-400">Tanggal Mulai</label>
+                                      <input type="date" name="tanggal_mulai" value="{{ \Carbon\Carbon::parse($booking->tanggal_mulai)->format('Y-m-d') }}" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700" required>
+                                  </div>
+                                  <div>
+                                      <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-400">Tanggal Selesai</label>
+                                      <input type="date" name="tanggal_selesai" value="{{ \Carbon\Carbon::parse($booking->tanggal_selesai)->format('Y-m-d') }}" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700" required>
+                                  </div>
+                              </div>
+                              <div>
+                                  <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-400">Total Harga (Rp)</label>
+                                  <input type="number" name="total_harga" value="{{ $booking->total_harga }}" min="1" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700" required>
+                              </div>
+                              <div>
+                                  <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-400">No. HP Kontak</label>
+                                  <input type="text" name="contact_hp" value="{{ $booking->contact_hp }}" maxlength="20" placeholder="Opsional" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700">
+                              </div>
+                              <div>
+                                  <label class="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-400">Catatan</label>
+                                  <textarea name="notes" rows="2" maxlength="1000" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700">{{ $booking->notes }}</textarea>
+                              </div>
+                              <button class="rounded-lg bg-blue-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-blue-800">Simpan Perubahan</button>
+                          </form>
+                      </details>
+                      @endif
                  </div>
                 @endif
 
