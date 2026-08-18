@@ -21,6 +21,36 @@ class AdminDashboardController extends Controller
             ->whereYear('created_at', now()->year)
             ->sum('total_harga');
 
+        $allBookings = Booking::select('id', 'created_at', 'status', 'service_type', 'total_harga')->get();
+
+        $monthSeries = collect(range(5, 0))->map(fn ($i) => now()->copy()->subMonths($i));
+
+        $chartData = [
+            'months' => $monthSeries->map(fn ($m) => $m->translatedFormat('M Y'))->values(),
+            'bookingCounts' => $monthSeries->map(
+                fn ($m) => $allBookings->filter(fn ($b) => $b->created_at->isSameMonth($m))->count()
+            )->values(),
+            'revenues' => $monthSeries->map(
+                fn ($m) => $allBookings->filter(fn ($b) => $b->created_at->isSameMonth($m) && $b->status === 'completed')->sum('total_harga')
+            )->values(),
+            'services' => [
+                'labels' => ['Rental', 'Travel'],
+                'data' => [
+                    $allBookings->where('service_type', 'rental')->count(),
+                    $allBookings->where('service_type', 'travel')->count(),
+                ],
+            ],
+            'status' => [
+                'labels' => ['Menunggu', 'Sopir Ditugaskan', 'Selesai', 'Dibatalkan'],
+                'data' => [
+                    $allBookings->where('status', 'pending')->count(),
+                    $allBookings->where('status', 'sopir_assigned')->count(),
+                    $allBookings->where('status', 'completed')->count(),
+                    $allBookings->where('status', 'cancelled')->count(),
+                ],
+            ],
+        ];
+
         $recentBookings = Booking::with(['pelanggan', 'vehicle'])
             ->latest()
             ->take(4)
@@ -60,7 +90,8 @@ class AdminDashboardController extends Controller
             'totalMitra',
             'monthlyRevenue',
             'recentBookings',
-            'revenueShare'
+            'revenueShare',
+            'chartData'
         ));
     }
 }
