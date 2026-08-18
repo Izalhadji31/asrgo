@@ -126,6 +126,7 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->group(function
     Route::get('/bookings/{booking}/payment/status', [PaymentController::class, 'status'])->name('payments.status');
     Route::post('/bookings/{booking}/refund-request', [BookingController::class, 'requestRefund'])->name('bookings.refund.request');
     Route::post('/bookings/{booking}/review', [ReviewController::class, 'store'])->name('bookings.review');
+    Route::get('/bookings/{booking}/invoice', [BookingController::class, 'invoice'])->name('bookings.invoice');
     Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
 });
 

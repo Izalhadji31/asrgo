@@ -172,6 +172,10 @@
                 <a href="{{ route('ticket.show', $booking) }}" class="rounded-lg border border-[#3F7D6C] px-4 py-2 text-sm font-medium text-[#3F7D6C] transition hover:bg-[#3F7D6C] hover:text-white">Lihat Tiket</a>
             @endif
 
+            @if ($booking->payment_status === 'paid')
+                <a href="{{ route('bookings.invoice', $booking) }}" target="_blank" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100">Cetak Invoice</a>
+            @endif
+
             @if (in_array($booking->status, ['pending', 'sopir_assigned'], true) && $booking->payment_status === 'paid' && $booking->refund_status === 'none' && ! $dep)
                 <details class="text-left">
                     <summary class="cursor-pointer rounded-lg border border-red-200 px-4 py-2 text-sm font-medium text-red-600">Ajukan Refund</summary>

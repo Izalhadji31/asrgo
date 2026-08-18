@@ -324,6 +324,15 @@ class BookingController extends Controller
         return view('customer.bookings.show', compact('booking'));
     }
 
+    public function invoice(Booking $booking)
+    {
+        $this->authorize('view', $booking);
+
+        $booking->load(['vehicle', 'sopir', 'pelanggan', 'passengers']);
+
+        return view('customer.bookings.invoice', compact('booking'));
+    }
+
     public function store(StoreBookingRequest $request)
     {
         $vehicleId = $request->vehicle_id ?: null;
