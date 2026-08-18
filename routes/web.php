@@ -100,6 +100,7 @@ Route::middleware('auth')->group(function () {
 
 Route::middleware(['auth', 'role:mitra'])->prefix('mitra')->group(function () {
     Route::get('/dashboard', [MitraDashboardController::class, 'index'])->name('mitra.dashboard');
+    Route::get('/payouts', [MitraDashboardController::class, 'payouts'])->name('mitra.payouts');
     Route::get('/vehicles', [VehicleController::class, 'index'])->name('vehicles.index');
     Route::get('/vehicles/create', [VehicleController::class, 'create'])->name('vehicles.create');
     Route::post('/vehicles', [VehicleController::class, 'store'])->name('vehicles.store');

@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Booking;
-use App\Models\NotificationLog;
 use App\Models\Payout;
 use App\Models\RevenueShare;
 
@@ -38,13 +37,13 @@ class RevenueService
             return $payout;
         }
 
-        NotificationLog::create([
-            'user_id' => $mitraId,
-            'type' => 'payout_created',
-            'message' => 'Payout untuk booking selesai telah dibuat.',
-            'related_model' => Payout::class,
-            'related_id' => $payout->id,
-        ]);
+        app(NotificationService::class)->log(
+            $mitraId,
+            'payout_created',
+            'Payout #'.$payout->id.' sebesar Rp '.number_format((float) $payout->jumlah_mitra, 0, ',', '.').' untuk booking #'.$booking->id.' telah dibuat.',
+            Payout::class,
+            $payout->id
+        );
 
         return $payout;
     }

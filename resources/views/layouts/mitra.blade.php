@@ -35,6 +35,7 @@
                 $menu = [
                     ['label' => 'Dashboard', 'icon' => 'fa-solid fa-gauge-high', 'route' => 'mitra.dashboard', 'active' => ['mitra.dashboard']],
                     ['label' => 'Kendaraan', 'icon' => 'fa-solid fa-car-side', 'route' => 'vehicles.index', 'active' => ['vehicles.index', 'vehicles.create', 'vehicles.edit']],
+                    ['label' => 'Pendapatan', 'icon' => 'fa-solid fa-sack-dollar', 'route' => 'mitra.payouts', 'active' => ['mitra.payouts']],
                     ['label' => 'Notifikasi', 'icon' => 'fa-solid fa-bell', 'route' => 'notifications.index', 'active' => ['notifications.*']],
                 ];
                 @endphp
