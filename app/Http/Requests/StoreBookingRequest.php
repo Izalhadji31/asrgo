@@ -43,6 +43,7 @@ class StoreBookingRequest extends FormRequest
             'passengers'      => ['nullable', 'array', 'min:1'],
             'passengers.*.nama' => ['required', 'string', 'max:100'],
             'passengers.*.no_hp' => ['required', 'string', 'max:20'],
+            'contact_hp'      => ['required_if:service_type,rental', 'nullable', 'string', 'max:20'],
         ];
     }
 
@@ -63,6 +64,7 @@ class StoreBookingRequest extends FormRequest
             'passengers.min'                     => 'Minimal satu penumpang harus diisi.',
             'passengers.*.nama.required'         => 'Nama penumpang wajib diisi.',
             'passengers.*.no_hp.required'        => 'Nomor HP penumpang wajib diisi.',
+            'contact_hp.required_if'             => 'Nomor HP kontak wajib diisi untuk layanan rental.',
         ];
     }
 

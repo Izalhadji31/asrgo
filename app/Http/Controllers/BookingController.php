@@ -32,7 +32,7 @@ class BookingController extends Controller
 
     public function index()
     {
-        $bookings = Booking::with(['vehicle', 'pelanggan', 'sopir', 'review'])->latest();
+        $bookings = Booking::with(['vehicle', 'pelanggan', 'sopir', 'review', 'passengers'])->latest();
 
         if (Auth::user()->role === 'customer') {
             $bookings = $bookings->where('pelanggan_id', Auth::id());
@@ -274,6 +274,7 @@ class BookingController extends Controller
             durationDays: $duration,
             passengerCount: (int) ($request->jumlah_penumpang ?: 1),
             passengers: $request->input('passengers', []),
+            contactHp: $request->contact_hp,
         );
 
         return redirect()->route('payments.show', $booking)->with('success', 'Booking berhasil dibuat. Selesaikan pembayaran untuk melanjutkan.');

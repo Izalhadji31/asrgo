@@ -412,7 +412,15 @@
                         @error('tanggal_mulai') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                     </div>
 
-                     {{-- Passenger Count (Travel) --}}
+                     {{-- Contact HP --}}
+                    <div x-show="serviceType === 'rental' || (serviceType === 'travel' && selectedRouteId)">
+                        <label class="mb-1.5 block text-sm font-medium text-slate-700">No. HP Kontak</label>
+                        <input type="text" name="contact_hp" value="{{ old('contact_hp') }}" placeholder="Nomor HP yang bisa dihubungi sopir" class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm text-slate-800 transition focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-400/20" x-bind:required="serviceType === 'rental'">
+                        <p class="mt-1 text-xs text-slate-500">Untuk koordinasi sopir. Travel otomatis pakai HP penumpang pertama bila kosong.</p>
+                        @error('contact_hp') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                    </div>
+
+                    {{-- Passenger Count (Travel) --}}
                      <div x-show="serviceType === 'travel' && selectedRouteId">
                          <label class="mb-1.5 block text-sm font-medium text-slate-700">Jumlah Penumpang</label>
                          <div class="relative">

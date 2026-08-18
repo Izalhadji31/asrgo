@@ -59,6 +59,7 @@ class Booking extends Model
         'destination',
         'flight_number',
         'notes',
+        'contact_hp',
         'status',
         'total_harga',
         'payment_status',

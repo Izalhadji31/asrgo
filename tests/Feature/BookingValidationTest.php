@@ -40,6 +40,7 @@ class BookingValidationTest extends TestCase
 
         $response = $this->actingAs($customer)->post(route('bookings.store'), [
             'service_type' => 'rental',
+            'contact_hp' => '081234567890',
             'vehicle_id' => $vehicle->id,
             'tanggal_mulai' => '2026-08-11',
             'tanggal_selesai' => '2026-08-13',
@@ -68,6 +69,7 @@ class BookingValidationTest extends TestCase
 
         $response = $this->actingAs($customer)->post(route('bookings.store'), [
             'service_type' => 'rental',
+            'contact_hp' => '081234567890',
             'vehicle_id' => $vehicle->id,
             'tanggal_mulai' => $date,
             'with_driver' => '0',
@@ -80,6 +82,7 @@ class BookingValidationTest extends TestCase
             'pelanggan_id' => $customer->id,
             'vehicle_id' => $vehicle->id,
             'service_type' => 'rental',
+            'contact_hp' => '081234567890',
             'total_harga' => 400000,
         ]);
         $this->assertSame($date, $booking->tanggal_mulai->toDateString());
@@ -289,6 +292,7 @@ class BookingValidationTest extends TestCase
 
         $response = $this->actingAs($customer)->post(route('bookings.store'), [
             'service_type' => 'rental',
+            'contact_hp' => '081234567890',
             'vehicle_id' => $vehicle->id,
             'tanggal_mulai' => $date,
             'with_driver' => '1',

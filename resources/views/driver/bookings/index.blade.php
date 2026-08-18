@@ -91,7 +91,10 @@
                                 </td>
                                 <td class="px-5 py-4 font-medium text-slate-700">{{ $booking->vehicle?->nama ?? '-' }}</td>
                                 <td class="px-5 py-4 font-[IBM_Plex_Mono] text-slate-600">{{ $booking->vehicle?->plat_nomor ?? '-' }}</td>
-                                <td class="px-5 py-4 text-slate-600">{{ $booking->pelanggan?->name ?? '-' }}</td>
+                                <td class="px-5 py-4">
+                                    <div class="font-medium text-slate-700">{{ $booking->pelanggan?->name ?? '-' }}</div>
+                                    <div class="font-[IBM_Plex_Mono] text-xs text-slate-500">{{ $booking->contact_hp ?? $booking->passengers->first()?->no_hp ?? '-' }}</div>
+                                </td>
                                 <td class="px-5 py-4 text-slate-600">{{ \Carbon\Carbon::parse($booking->tanggal_mulai)->format('d M Y') }}</td>
                                 <td class="px-5 py-4 text-slate-600">{{ \Carbon\Carbon::parse($booking->tanggal_selesai)->format('d M Y') }}</td>
                                 <td class="px-5 py-4">

@@ -103,6 +103,7 @@ class BookingService
         float $durationDays = 1,
         int $passengerCount = 1,
         array $passengers = [],
+        ?string $contactHp = null,
     ): Booking {
         return DB::transaction(function () use (
             $customerId,
@@ -120,6 +121,7 @@ class BookingService
             $durationDays,
             $passengerCount,
             $passengers,
+            $contactHp,
         ): Booking {
             if ($serviceType === 'rental' && !$vehicleId) {
                 throw ValidationException::withMessages([
@@ -180,6 +182,7 @@ class BookingService
                 'destination'     => $destination,
                 'flight_number'   => $flightNumber,
                 'notes'           => $notes,
+                'contact_hp'      => $contactHp,
                 'status'          => 'pending',
                 'payment_status'  => Booking::PAYMENT_UNPAID,
                 'ticket_status'   => Booking::TICKET_NOT_CREATED,
