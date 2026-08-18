@@ -77,6 +77,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::post('/bookings/{booking}/refund/approve', [BookingController::class, 'approveRefund'])->name('admin.bookings.refund.approve');
     Route::post('/bookings/{booking}/refund/reject', [BookingController::class, 'rejectRefund'])->name('admin.bookings.refund.reject');
     Route::post('/bookings/{booking}/mark-paid', [BookingController::class, 'markAsFullyPaid'])->name('admin.bookings.mark-paid');
+    Route::post('/bookings/{booking}/cancel', [BookingController::class, 'adminCancel'])->name('admin.bookings.cancel');
     Route::get('/mitras', [MitraManagementController::class, 'index'])->name('admin.mitras.index');
     Route::post('/mitras', [MitraManagementController::class, 'store'])->name('admin.mitras.store');
     Route::get('/revenue-shares', [RevenueShareController::class, 'index'])->name('admin.revenue-shares.index');
@@ -120,6 +121,7 @@ Route::middleware(['auth', 'role:customer'])->prefix('customer')->group(function
     Route::get('/bookings/{booking}/payment/status', [PaymentController::class, 'status'])->name('payments.status');
     Route::post('/bookings/{booking}/refund-request', [BookingController::class, 'requestRefund'])->name('bookings.refund.request');
     Route::post('/bookings/{booking}/review', [ReviewController::class, 'store'])->name('bookings.review');
+    Route::get('/bookings/{booking}', [BookingController::class, 'show'])->name('bookings.show');
 });
 
 require __DIR__.'/auth.php';

@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Throwable;
 
 class BookingController extends Controller
@@ -215,6 +216,15 @@ class BookingController extends Controller
             'travelBookingCounts',
             'travelDepartures'
         ));
+    }
+
+    public function show(Booking $booking)
+    {
+        $this->authorize('view', $booking);
+
+        $booking->load(['vehicle', 'sopir', 'pelanggan', 'review']);
+
+        return view('customer.bookings.show', compact('booking'));
     }
 
     public function store(StoreBookingRequest $request)
@@ -467,6 +477,27 @@ class BookingController extends Controller
         $this->bookingService->markCompleted($booking);
 
         return redirect()->back()->with('success', 'Booking selesai dan payout dibuat.');
+    }
+
+    public function adminCancel(Booking $booking)
+    {
+        if (Auth::user()->role !== 'admin') {
+            abort(403);
+        }
+
+        if (in_array($booking->status, [Booking::STATUS_COMPLETED, Booking::STATUS_CANCELLED], true)) {
+            return back()->withErrors(['booking' => 'Booking yang sudah selesai atau dibatalkan tidak dapat dibatalkan lagi.']);
+        }
+
+        try {
+            $this->bookingService->cancel($booking);
+        } catch (ValidationException $exception) {
+            return back()->withErrors($exception->errors());
+        }
+
+        AuditLog::record('cancel_booking', 'Membatalkan booking #'.$booking->id, Booking::class, $booking->id);
+
+        return back()->with('success', 'Booking #'.$booking->id.' berhasil dibatalkan. Customer sudah dinotifikasi.');
     }
 
     public function markAsFullyPaid(Booking $booking)

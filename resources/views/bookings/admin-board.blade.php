@@ -413,6 +413,13 @@
                           <button class="w-full rounded-lg border border-red-200 px-5 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-50">Refund Langsung via Midtrans</button>
                       </form>
                       @endif
+
+                      @if (in_array($booking->payment_status, ['unpaid', 'failed', 'expired'], true))
+                      <form action="{{ route('admin.bookings.cancel', $booking) }}" method="POST" onsubmit="return confirm('Batalkan booking ini? Customer akan dinotifikasi.')">
+                          @csrf
+                          <button class="w-full rounded-lg bg-red-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-red-700">Batalkan Booking</button>
+                      </form>
+                      @endif
                  </div>
                 @endif
 

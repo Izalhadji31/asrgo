@@ -140,89 +140,13 @@
                                       @endif
                                   </td>
                                 <td class="px-5 py-4 font-[IBM_Plex_Mono] text-slate-700">Rp {{ number_format($booking->total_harga, 0, ',', '.') }}</td>
-                                 <td class="px-5 py-4">
-                                     @if (!in_array($booking->status, ['cancelled', 'completed']))
-                                         @if (in_array($booking->payment_status, ['unpaid', 'failed', 'expired'], true))
-                                             <div class="flex items-center gap-2">
-                                                 <a href="{{ route('payments.show', $booking) }}" class="rounded-lg bg-blue-900 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-blue-800">Bayar</a>
-                                                 <form action="{{ route('bookings.cancel', $booking) }}" method="POST" onsubmit="return confirm('Batalkan booking ini?')">
-                                                     @csrf
-                                                     <button class="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-50">Batal</button>
-                                                 </form>
-                                             </div>
-                                          @elseif ($booking->payment_status === 'pending')
-                                              <a href="{{ route('payments.show', $booking) }}" class="rounded-lg bg-blue-900 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-blue-800">
-                                                  {{ $booking->payment_token && $booking->payment_expired_at?->isFuture() ? 'Lanjutkan Pembayaran' : 'Buka Pembayaran' }}
-                                              </a>
-                                          @elseif ($booking->refund_status === 'none')
-                                              @if ($booking->ticket_number)
-                                                  <a href="{{ route('ticket.show', $booking) }}" class="mb-2 inline-flex rounded-lg border border-[#3F7D6C] px-3 py-1.5 text-xs font-medium text-[#3F7D6C] transition hover:bg-[#3F7D6C] hover:text-white">Lihat Tiket</a>
-                                              @endif
-                                              <details class="max-w-xs text-left">
-                                                  <summary class="cursor-pointer text-xs font-medium text-red-600">Ajukan Refund</summary>
-                                                  <form action="{{ route('bookings.refund.request', $booking) }}" method="POST" class="mt-2 space-y-2 rounded-lg border border-red-100 bg-red-50 p-3">
-                                                      @csrf
-                                                      <label class="block text-xs font-medium text-red-800" for="refund-reason-{{ $booking->id }}">Alasan refund</label>
-                                                      <textarea id="refund-reason-{{ $booking->id }}" name="refund_reason" rows="3" minlength="10" maxlength="1000" required class="w-full rounded-lg border border-red-200 px-2 py-1.5 text-xs text-slate-700" placeholder="Jelaskan alasan refund (minimal 10 karakter)"></textarea>
-                                                      <button type="submit" class="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-700">Kirim Pengajuan</button>
-                                                  </form>
-                                              </details>
-                                          @elseif ($booking->refund_status === 'requested')
-                                              @if ($booking->ticket_number)
-                                                  <a href="{{ route('ticket.show', $booking) }}" class="mb-2 inline-flex rounded-lg border border-[#3F7D6C] px-3 py-1.5 text-xs font-medium text-[#3F7D6C] transition hover:bg-[#3F7D6C] hover:text-white">Lihat Tiket</a>
-                                              @endif
-                                              <span class="text-xs text-orange-600">Menunggu review admin</span>
-                                          @elseif ($booking->refund_status === 'pending')
-                                              @if ($booking->ticket_number)
-                                                  <a href="{{ route('ticket.show', $booking) }}" class="mb-2 inline-flex rounded-lg border border-[#3F7D6C] px-3 py-1.5 text-xs font-medium text-[#3F7D6C] transition hover:bg-[#3F7D6C] hover:text-white">Lihat Tiket</a>
-                                              @endif
-                                              <span class="text-xs text-blue-600">Menunggu proses Midtrans</span>
-                                          @elseif ($booking->ticket_number)
-                                             <a href="{{ route('ticket.show', $booking) }}" class="rounded-lg border border-[#3F7D6C] px-3 py-1.5 text-xs font-medium text-[#3F7D6C] transition hover:bg-[#3F7D6C] hover:text-white">Lihat Tiket</a>
-                                         @else
-                                             <span class="text-xs text-slate-400">Menunggu tiket</span>
-                                         @endif
-                                     @else
-                                         <div class="space-y-2">
-                                             @if ($booking->ticket_number)
-                                                 <a href="{{ route('ticket.show', $booking) }}" class="inline-flex rounded-lg border border-[#3F7D6C] px-3 py-1.5 text-xs font-medium text-[#3F7D6C] transition hover:bg-[#3F7D6C] hover:text-white">Lihat Tiket</a>
-                                             @endif
-                                             @if ($booking->status === 'completed')
-                                                 @if ($booking->review)
-                                                     <span class="inline-flex items-center gap-1 text-xs font-medium text-[#E8A33D]">
-                                                         <span>{{ str_repeat('★', $booking->review->rating) }}</span><span class="text-slate-300">{{ str_repeat('★', 5 - $booking->review->rating) }}</span>
-                                                         @if ($booking->review->komentar)
-                                                             <span class="ml-1 max-w-[10rem] truncate text-slate-400" title="{{ $booking->review->komentar }}">{{ $booking->review->komentar }}</span>
-                                                         @endif
-                                                     </span>
-                                                 @else
-                                                     <details class="text-left">
-                                                         <summary class="cursor-pointer text-xs font-medium text-[#E8A33D]">Beri Ulasan</summary>
-                                                         <form action="{{ route('bookings.review', $booking) }}" method="POST" class="mt-2 space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
-                                                             @csrf
-                                                             <div class="flex items-center gap-1">
-                                                                 @for ($i = 1; $i <= 5; $i++)
-                                                                 <label class="cursor-pointer">
-                                                                     <input type="radio" name="rating" value="{{ $i }}" class="peer sr-only" required>
-                                                                     <span class="text-xl text-slate-300 transition peer-checked:text-[#E8A33D]">★</span>
-                                                                 </label>
-                                                                 @endfor
-                                                             </div>
-                                                             <textarea name="komentar" rows="2" maxlength="1000" class="w-full rounded-lg border border-amber-200 px-2 py-1.5 text-xs text-slate-700" placeholder="Komentar (opsional, maksimal 1000 karakter)"></textarea>
-                                                             <button type="submit" class="rounded-lg bg-[#E8A33D] px-3 py-1.5 text-xs font-semibold text-blue-900 transition hover:opacity-90">Kirim Ulasan</button>
-                                                         </form>
-                                                     </details>
-                                                 @endif
-                                             @else
-                                                 <span class="text-xs text-slate-400">—</span>
-                                             @endif
-                                         </div>
-                                     @endif
+                                <td class="px-5 py-4">
+                                    <a href="{{ route('bookings.show', $booking) }}" class="inline-flex rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-100">Detail</a>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="8" class="px-5 py-12 text-center">
+                                <td colspan="9" class="px-5 py-12 text-center">
                                     <div class="flex flex-col items-center gap-2">
                                         <svg class="h-10 w-10 text-slate-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15a2.25 2.25 0 012.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
