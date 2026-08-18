@@ -118,6 +118,7 @@ Route::middleware(['auth', 'role:driver'])->prefix('driver')->group(function () 
     Route::get('/bookings', [BookingController::class, 'index'])->name('driver.bookings.index');
     Route::post('/bookings/{booking}/accept', [BookingController::class, 'acceptAssignment'])->name('driver.bookings.accept');
     Route::post('/bookings/{booking}/reject', [BookingController::class, 'rejectAssignment'])->name('driver.bookings.reject');
+    Route::post('/bookings/{booking}/start', [BookingController::class, 'startTrip'])->name('driver.bookings.start');
 });
 
 Route::middleware(['auth', 'role:customer'])->prefix('customer')->group(function () {

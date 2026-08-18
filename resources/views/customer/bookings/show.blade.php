@@ -27,6 +27,7 @@
         ['label' => 'Pembayaran Diterima', 'done' => $booking->payment_status === 'paid', 'time' => $booking->payment_paid_at?->translatedFormat('d M Y, H:i')],
         ['label' => 'Sopir Ditugaskan', 'done' => in_array($booking->status, ['sopir_assigned', 'completed'], true), 'time' => null],
         ['label' => 'Tiket Dibuat', 'done' => (bool) $booking->ticket_number, 'time' => null],
+        ['label' => 'Perjalanan Dimulai', 'done' => (bool) $booking->perjalanan_dimulai_at, 'time' => $booking->perjalanan_dimulai_at?->translatedFormat('d M Y, H:i')],
     ];
     if ($booking->service_type === 'travel') {
         $steps[] = ['label' => 'Kendaraan Berangkat', 'done' => (bool) $dep, 'time' => $dep?->departed_at?->translatedFormat('d M Y, H:i')];
@@ -57,6 +58,9 @@
                 @endif
                 @if ($dep)
                     <span class="rounded-full bg-teal-100 px-3 py-1 text-xs font-semibold text-teal-700">Sudah Berangkat</span>
+                @endif
+                @if ($booking->perjalanan_dimulai_at && ! in_array($booking->status, ['completed', 'cancelled'], true))
+                    <span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">Dalam Perjalanan</span>
                 @endif
             </div>
 

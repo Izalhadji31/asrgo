@@ -101,6 +101,10 @@
                                     <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $s['class'] }}">{{ $s['label'] }}</span>
                                     @if ($booking->sopir_id === Auth::id() && ! $booking->driver_confirmed_at && ! in_array($booking->status, ['completed', 'cancelled'], true))
                                         <span class="mt-1 block rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">Menunggu Konfirmasi</span>
+                                    @elseif ($booking->driver_confirmed_at && ! $booking->perjalanan_dimulai_at && ! in_array($booking->status, ['completed', 'cancelled'], true))
+                                        <span class="mt-1 block rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">Dikonfirmasi</span>
+                                    @elseif ($booking->perjalanan_dimulai_at && ! in_array($booking->status, ['completed', 'cancelled'], true))
+                                        <span class="mt-1 block rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">Dalam Perjalanan</span>
                                     @elseif ($booking->driver_confirmed_at)
                                         <span class="mt-1 block rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">Dikonfirmasi</span>
                                     @endif
@@ -119,6 +123,12 @@
                                                 <button class="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-50">Tolak</button>
                                             </form>
                                             @else
+                                            @if (! $booking->perjalanan_dimulai_at)
+                                            <form action="{{ route('driver.bookings.start', $booking) }}" method="POST">
+                                                @csrf
+                                                <button class="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-blue-700">Mulai Perjalanan</button>
+                                            </form>
+                                            @endif
                                             <form action="{{ route('bookings.complete', $booking) }}" method="POST">
                                                 @csrf
                                                 <button class="rounded-lg bg-green-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-green-700">Selesai</button>

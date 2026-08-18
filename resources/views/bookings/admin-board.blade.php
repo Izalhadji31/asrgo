@@ -115,6 +115,10 @@
                                          @endif
                                          @if ($booking->sopir_id && ! $booking->driver_confirmed_at && ! in_array($booking->status, ['completed', 'cancelled'], true))
                                              <span class="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">Menunggu konfirmasi sopir</span>
+                                         @elseif ($booking->sopir_id && $booking->driver_confirmed_at && ! $booking->perjalanan_dimulai_at && ! in_array($booking->status, ['completed', 'cancelled'], true))
+                                             <span class="rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">Sopir dikonfirmasi</span>
+                                         @elseif ($booking->perjalanan_dimulai_at && ! in_array($booking->status, ['completed', 'cancelled'], true))
+                                             <span class="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold text-blue-700">Dalam Perjalanan</span>
                                          @elseif ($booking->sopir_id && $booking->driver_confirmed_at)
                                              <span class="rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">Sopir dikonfirmasi</span>
                                          @endif

@@ -51,6 +51,7 @@ class Booking extends Model
         'route_id',
         'sopir_id',
         'driver_confirmed_at',
+        'perjalanan_dimulai_at',
         'service_type',
         'session',
         'jumlah_penumpang',
@@ -101,6 +102,7 @@ class Booking extends Model
         'refund_reviewed_at' => 'datetime',
         'refunded_at' => 'datetime',
         'driver_confirmed_at' => 'datetime',
+        'perjalanan_dimulai_at' => 'datetime',
     ];
 
     public function pelanggan()

@@ -588,6 +588,31 @@ class BookingController extends Controller
         return redirect()->back()->with('success', 'Booking selesai dan payout dibuat.');
     }
 
+    public function startTrip(Booking $booking)
+    {
+        if (Auth::user()->role !== 'driver' || $booking->sopir_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if (in_array($booking->status, [Booking::STATUS_CANCELLED, Booking::STATUS_COMPLETED], true)) {
+            return back()->withErrors(['booking' => 'Booking sudah selesai atau dibatalkan.']);
+        }
+
+        if (! $booking->perjalanan_dimulai_at) {
+            $booking->update(['perjalanan_dimulai_at' => now()]);
+
+            $this->notificationService->log(
+                $booking->pelanggan_id,
+                'trip_started',
+                'Perjalanan untuk booking Anda telah dimulai.',
+                Booking::class,
+                $booking->id
+            );
+        }
+
+        return back()->with('success', 'Perjalanan dimulai. Hati-hati di jalan.');
+    }
+
     public function acceptAssignment(Booking $booking)
     {
         if (Auth::user()->role !== 'driver' || $booking->sopir_id !== Auth::id()) {
