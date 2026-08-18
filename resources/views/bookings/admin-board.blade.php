@@ -115,15 +115,22 @@
                                      </span>
                                  </td>
                                  <td class="px-5 py-4">
-                                      <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $booking->payment_status === 'paid' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700' }}">
-                                         {{ match ($booking->payment_status) {
-                                             'paid' => 'Lunas',
-                                             'pending' => 'Menunggu',
-                                             'failed' => 'Gagal',
-                                             'expired' => 'Kedaluwarsa',
-                                             default => 'Belum Dibayar',
-                                          } }}
+                                      <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $booking->payment_status === 'paid' ? ($booking->payment_scheme === 'dp' ? 'bg-sky-100 text-sky-700' : 'bg-emerald-100 text-emerald-700') : 'bg-amber-100 text-amber-700' }}">
+                                         @if ($booking->payment_status === 'paid' && $booking->payment_scheme === 'dp')
+                                             DP 30% Dibayar
+                                         @else
+                                             {{ match ($booking->payment_status) {
+                                                 'paid' => 'Lunas',
+                                                 'pending' => 'Menunggu',
+                                                 'failed' => 'Gagal',
+                                                 'expired' => 'Kedaluwarsa',
+                                                 default => 'Belum Dibayar',
+                                              } }}
+                                         @endif
                                       </span>
+                                      @if ($booking->payment_status === 'paid' && $booking->payment_scheme === 'dp')
+                                          <span class="mt-2 block rounded-full px-3 py-1 text-xs font-semibold bg-amber-100 text-amber-700">Sisa 70% belum lunas</span>
+                                      @endif
                                       @if ($booking->refund_status !== 'none' && isset($refundStatusLabels[$booking->refund_status]))
                                           <span class="mt-2 inline-flex rounded-full px-3 py-1 text-xs font-semibold {{ $refundStatusLabels[$booking->refund_status]['class'] }}">
                                               {{ $refundStatusLabels[$booking->refund_status]['label'] }}
@@ -365,11 +372,20 @@
                     </form>
                     @endif
 
-                     @if ($booking->vehicle_id && !$booking->ticket_number && $booking->payment_status === 'paid')
+                     @if ($booking->vehicle_id && !$booking->ticket_number && $booking->payment_status === 'paid' && $booking->payment_scheme !== 'dp')
                     <form action="{{ route('admin.bookings.generate-ticket', $booking) }}" method="POST">
                         @csrf
                         <button class="w-full rounded-lg bg-blue-900 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-900">
                             Buat Tiket
+                        </button>
+                    </form>
+                     @endif
+
+                     @if ($booking->payment_status === 'paid' && $booking->payment_scheme === 'dp' && !in_array($booking->status, ['completed', 'cancelled'], true))
+                    <form action="{{ route('admin.bookings.mark-paid', $booking) }}" method="POST" onsubmit="return confirm('Konfirmasi pelunasan sisa 70% sudah diterima manual?')">
+                        @csrf
+                        <button class="w-full rounded-lg bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-600">
+                            Tandai Lunas (Sisa 70% Manual)
                         </button>
                     </form>
                      @endif

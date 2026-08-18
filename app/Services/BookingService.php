@@ -6,6 +6,7 @@ use App\Models\Booking;
 use App\Models\Route;
 use App\Models\RouteAssignment;
 use App\Models\TravelDeparture;
+use App\Models\User;
 use App\Models\Vehicle;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -162,7 +163,7 @@ class BookingService
                 $finalSopirId = $assignedVehicle->sopir_id;
             }
 
-            return Booking::create([
+            $booking = Booking::create([
                 'pelanggan_id'    => $customerId,
                 'vehicle_id'      => $finalVehicleId,
                 'sopir_id'        => $finalSopirId,
@@ -182,6 +183,21 @@ class BookingService
                 'total_harga'     => $total,
                 'with_driver'     => $withDriver,
             ]);
+
+            $serviceLabel = $serviceType === 'travel' ? 'Travel' : 'Rental';
+            $customerName = $booking->pelanggan?->name ?? 'Customer #'.$customerId;
+
+            foreach (User::where('role', 'admin')->pluck('id') as $adminId) {
+                $this->notificationService->log(
+                    $adminId,
+                    'booking_created',
+                    'Booking baru #'.$booking->id.' ('.$serviceLabel.') dari '.$customerName.' menunggu penanganan.',
+                    Booking::class,
+                    $booking->id
+                );
+            }
+
+            return $booking;
         });
     }
 
@@ -276,6 +292,12 @@ class BookingService
         if ($booking->payment_status !== Booking::PAYMENT_PAID || $booking->ticket_status !== Booking::TICKET_CREATED) {
             throw ValidationException::withMessages([
                 'booking' => 'Booking belum lunas atau tiket belum dibuat.',
+            ]);
+        }
+
+        if ($booking->payment_scheme === Booking::PAYMENT_SCHEME_DP) {
+            throw ValidationException::withMessages([
+                'booking' => 'Booking masih berstatus DP 30%. Konfirmasi pelunasan di panel admin terlebih dahulu.',
             ]);
         }
 

@@ -29,6 +29,10 @@ class Booking extends Model
 
     public const PAYMENT_EXPIRED = 'expired';
 
+    public const PAYMENT_SCHEME_DP = 'dp';
+
+    public const PAYMENT_SCHEME_FULL = 'full';
+
     public const REFUND_NONE = 'none';
 
     public const REFUND_REQUESTED = 'requested';
@@ -62,6 +66,8 @@ class Booking extends Model
         'payment_token',
         'payment_transaction_id',
         'payment_type',
+        'payment_scheme',
+        'payment_amount',
         'payment_paid_at',
         'payment_expired_at',
         'payment_payload',
@@ -84,6 +90,7 @@ class Booking extends Model
         'tanggal_mulai' => 'date',
         'tanggal_selesai' => 'date',
         'with_driver' => 'boolean',
+        'payment_amount' => 'integer',
         'payment_paid_at' => 'datetime',
         'payment_expired_at' => 'datetime',
         'payment_payload' => 'array',
@@ -124,6 +131,20 @@ class Booking extends Model
             self::TICKET_CREATED => 'Tiket Dibuat',
             default => 'Belum Dapat Tiket',
         };
+    }
+
+    public function paymentSchemeLabel(): string
+    {
+        return match ($this->payment_scheme) {
+            self::PAYMENT_SCHEME_DP => 'DP 30%',
+            default => 'Lunas',
+        };
+    }
+
+    public function isFullyPaid(): bool
+    {
+        return $this->payment_status === self::PAYMENT_PAID
+            && $this->payment_scheme !== self::PAYMENT_SCHEME_DP;
     }
 
     public function canTransitionTo(string $nextStatus): bool

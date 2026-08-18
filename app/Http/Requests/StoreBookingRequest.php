@@ -37,7 +37,7 @@ class StoreBookingRequest extends FormRequest
             'destination'     => ['nullable', 'string', 'max:255'],
             'flight_number'   => ['nullable', 'string', 'max:50'],
             'notes'           => ['nullable', 'string', 'max:500'],
-            'session'         => ['required_if:service_type,travel', 'in:pagi,siang'],
+            'session'         => ['required_if:service_type,travel', 'nullable', 'in:pagi,siang'],
             'with_driver'     => ['nullable', 'boolean'],
             'duration'        => ['required_if:service_type,rental', 'nullable', 'numeric', 'in:0.5,1,2,3,4,5,6,7'],
         ];
@@ -55,6 +55,8 @@ class StoreBookingRequest extends FormRequest
             'tanggal_selesai.after_or_equal'     => 'Tanggal selesai harus setelah atau sama dengan tanggal mulai.',
             'jumlah_penumpang.required_if'       => 'Jumlah penumpang harus diisi untuk pemesanan travel.',
             'jumlah_penumpang.min'               => 'Jumlah penumpang minimal 1 orang.',
+            'session.in'                         => 'Sesi keberangkatan tidak valid. Pilih sesi Pagi atau Siang.',
+            'session.required_if'                => 'Pilih sesi keberangkatan.',
         ];
     }
 

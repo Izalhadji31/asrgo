@@ -125,7 +125,7 @@
                                 <td class="px-5 py-4">
                                     <div class="flex items-center gap-3">
                                         @if ($vehicle->foto)
-                                            <img src="{{ Storage::url($vehicle->foto) }}" alt="{{ $vehicle->nama }}" class="h-10 w-10 rounded-lg object-cover">
+                                            <img src="{{ $vehicle->foto_url }}" alt="{{ $vehicle->nama }}" class="h-10 w-10 rounded-lg object-cover">
                                         @else
                                             <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-xs font-semibold text-slate-500">N/A</div>
                                         @endif

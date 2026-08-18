@@ -12,6 +12,7 @@
             initialDuration: @json(old('duration')),
             initialTravelDate: @json(old('tanggal_mulai')),
             initialPassengerCount: @json(old('jumlah_penumpang', 1)),
+            initialWithDriver: @json(old('with_driver', '1')),
             routeAssignments: @json($routeAssignments),
             routesData: @json($routesData),
             vehiclesData: @json($vehiclesData),
@@ -22,6 +23,9 @@
     </script>
     <div class="space-y-6" x-data="{
          serviceType: window.__bookingData.initialServiceType,
+         withDriver: window.__bookingData.initialWithDriver,
+         selectedVehicleHasSopir: false,
+         formErrors: [],
          selectedRouteId: window.__bookingData.initialRouteId,
          selectedRouteOrigin: window.__bookingData.initialRouteOrigin,
          selectedRouteDestination: window.__bookingData.initialRouteDestination,
@@ -35,6 +39,8 @@
         selectedVehicleFoto: '',
         selectedVehicleJenis: '',
          selectedVehicleHarga: 0,
+         selectedVehicleHargaTanpaSopir: 0,
+         selectedVehicleHargaDenganSopir: 0,
          selectedDuration: window.__bookingData.initialDuration,
          passengerCount: Number(window.__bookingData.initialPassengerCount),
           travelDate: window.__bookingData.initialTravelDate,
@@ -66,11 +72,17 @@
 
              return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
          },
+        get rentalPricePerDay() {
+            if (this.withDriver === '1') {
+                return this.selectedVehicleHargaDenganSopir || this.selectedVehicleHarga;
+            }
+            return this.selectedVehicleHargaTanpaSopir || this.selectedVehicleHarga;
+        },
         get rentalTotal() {
-            if (!this.selectedVehicleHarga || !this.selectedDuration) return 0;
+            if (!this.rentalPricePerDay || !this.selectedDuration) return 0;
             let dur = parseFloat(this.selectedDuration);
-            if (dur === 0.5) return Math.ceil(this.selectedVehicleHarga / 2);
-            return this.selectedVehicleHarga * dur;
+            if (dur === 0.5) return Math.ceil(this.rentalPricePerDay / 2);
+            return this.rentalPricePerDay * dur;
         },
          get rentalTotalFormatted() {
              return 'Rp ' + new Intl.NumberFormat('id-ID').format(this.rentalTotal);
@@ -88,6 +100,8 @@
              this.selectedVehicleFoto = '';
              this.selectedVehicleJenis = '';
              this.selectedVehicleHarga = 0;
+             this.selectedVehicleHargaTanpaSopir = 0;
+             this.selectedVehicleHargaDenganSopir = 0;
              this.selectedDuration = null;
 
              if (type === 'travel' && (!this.travelDate || this.travelDate < this.minimumTravelDate)) {
@@ -122,6 +136,9 @@
                  this.selectedVehicleFoto = initialVehicle.foto;
                  this.selectedVehicleJenis = initialVehicle.jenis;
                  this.selectedVehicleHarga = initialVehicle.harga;
+                 this.selectedVehicleHargaTanpaSopir = Number(initialVehicle.harga_tanpa_sopir || 0);
+                 this.selectedVehicleHargaDenganSopir = Number(initialVehicle.harga_dengan_sopir || 0);
+                 this.selectedVehicleHasSopir = Boolean(initialVehicle.has_sopir);
              }
          },
          isSessionTimeAvailable(session) {
@@ -250,8 +267,11 @@
             this.selectedVehicleFoto = vehicle.foto;
             this.selectedVehicleJenis = vehicle.jenis;
             this.selectedVehicleHarga = vehicle.harga;
+            this.selectedVehicleHargaTanpaSopir = Number(vehicle.harga_tanpa_sopir || 0);
+            this.selectedVehicleHargaDenganSopir = Number(vehicle.harga_dengan_sopir || 0);
+            this.selectedVehicleHasSopir = Boolean(vehicle.has_sopir);
             $dispatch('close-modal', 'vehicle-picker');
-        },
+          },
          selectDuration(el) {
              this.selectedDuration = el.value;
              if (this.selectedVehicleId && !this.isRentalVehicleAvailable(this.selectedVehicleId)) {
@@ -271,6 +291,17 @@
              return !reservations.some(reservation =>
                  reservation.start <= this.rentalEndDate && reservation.end >= this.travelDate
              );
+         },
+         validateBookingForm() {
+             const missing = [];
+             if (this.serviceType === 'rental' && !this.selectedVehicleId) missing.push('Pilih kendaraan.');
+             if (this.serviceType === 'rental' && !this.selectedDuration) missing.push('Pilih durasi sewa.');
+             if (this.serviceType === 'travel' && !this.selectedRouteId) missing.push('Pilih rute travel.');
+             if (this.serviceType === 'travel' && !this.passengerCount) missing.push('Isi jumlah penumpang.');
+             if (this.serviceType === 'travel' && !this.selectedRouteSession) missing.push('Pilih sesi keberangkatan.');
+             if (!this.travelDate) missing.push('Pilih tanggal mulai.');
+             this.formErrors = missing;
+             return missing.length === 0;
          }
     }" x-on:pick-vehicle.window="selectVehicle($event.detail)">
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -279,8 +310,22 @@
         </div>
 
         <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <form action="{{ route('bookings.store') }}" method="POST">
+            <form action="{{ route('bookings.store') }}" method="POST" novalidate x-on:submit="if (!validateBookingForm()) $event.preventDefault()">
                 @csrf
+                @if ($errors->any())
+                <div class="mb-4 rounded-xl border border-red-200 bg-red-50 p-4">
+                    <p class="font-semibold text-red-700">Booking gagal disimpan:</p>
+                    <ul class="ml-5 list-disc text-sm text-red-600">
+                        @foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach
+                    </ul>
+                </div>
+                @endif
+                <div x-show="formErrors.length" style="display:none" class="mb-4 rounded-xl border border-red-200 bg-red-50 p-4">
+                    <p class="font-semibold text-red-700">Lengkapi data berikut sebelum menyimpan:</p>
+                    <ul class="ml-5 list-disc text-sm text-red-600">
+                        <template x-for="err in formErrors"><li x-text="err"></li></template>
+                    </ul>
+                </div>
                 <input type="hidden" name="service_type" :value="serviceType">
                 <input type="hidden" name="route_id" :value="selectedRouteId">
                 <input type="hidden" name="vehicle_id" :value="selectedVehicleId">
@@ -433,7 +478,7 @@
                                     <p class="font-[IBM_Plex_Mono] text-sm text-slate-600" x-text="selectedVehiclePlat"></p>
                                     <p class="text-xs text-slate-500 capitalize" x-text="selectedVehicleJenis"></p>
                                     <p class="mt-1 font-[IBM_Plex_Mono] text-sm font-bold text-blue-900"
-                                       x-text="'Rp ' + new Intl.NumberFormat('id-ID').format(selectedVehicleHarga) + ' /hari'"></p>
+                                       x-text="'Rp ' + new Intl.NumberFormat('id-ID').format(rentalPricePerDay) + ' /hari'"></p>
                                 </div>
                                 <button type="button" @click="selectVehicle({id: null, nama: '', plat_nomor: '', foto: '', jenis: '', harga: 0})"
                                     class="text-slate-400 hover:text-red-500">
@@ -456,7 +501,7 @@
                         <label class="mb-1.5 block text-sm font-medium text-slate-700">Opsi Sopir</label>
                         <div class="flex gap-3">
                             <label class="flex-1 cursor-pointer rounded-xl border-2 px-4 py-3 text-center transition has-[:checked]:border-blue-900 has-[:checked]:bg-blue-50">
-                                <input type="radio" name="with_driver" value="1" @checked(old('with_driver', '1') === '1') class="sr-only" x-bind:disabled="serviceType !== 'rental'">
+                                <input type="radio" name="with_driver" value="1" x-model="withDriver" @checked(old('with_driver', '1') === '1') class="sr-only" x-bind:disabled="serviceType !== 'rental'">
                                 <div class="flex items-center justify-center gap-2">
                                     <i class="fas fa-user-tie text-blue-700"></i>
                                     <span class="text-sm font-semibold text-slate-700">Dengan Sopir</span>
@@ -464,7 +509,7 @@
                                 <p class="mt-1 text-xs text-slate-400">Kendaraan + sopir</p>
                             </label>
                             <label class="flex-1 cursor-pointer rounded-xl border-2 border-slate-200 px-4 py-3 text-center transition has-[:checked]:border-blue-900 has-[:checked]:bg-blue-50">
-                                <input type="radio" name="with_driver" value="0" @checked(old('with_driver') === '0') class="sr-only" x-bind:disabled="serviceType !== 'rental'">
+                                <input type="radio" name="with_driver" value="0" x-model="withDriver" @checked(old('with_driver') === '0') class="sr-only" x-bind:disabled="serviceType !== 'rental'">
                                 <div class="flex items-center justify-center gap-2">
                                     <i class="fas fa-steering-wheel text-blue-700"></i>
                                     <span class="text-sm font-semibold text-slate-700">Tanpa Sopir (Lepas Kunci)</span>
@@ -472,6 +517,9 @@
                                 <p class="mt-1 text-xs text-slate-400">Hanya kendaraan</p>
                             </label>
                         </div>
+                        <p x-show="selectedVehicleId && !selectedVehicleHasSopir" class="mt-2 text-xs text-amber-600">
+                            <i class="fas fa-info-circle mr-1"></i>Kendaraan ini tersedia tanpa sopir.
+                        </p>
                         @error('with_driver') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
                     </div>
 
@@ -527,11 +575,12 @@
                         'id' => $v->id,
                         'nama' => $v->nama,
                         'plat_nomor' => $v->plat_nomor,
-                        'foto' => $v->foto ? Storage::url($v->foto) : '',
+                        'foto' => $v->foto_url,
                         'jenis' => $v->jenis,
                         'harga' => $v->harga_sewa_dengan_sopir_per_hari,
                         'harga_tanpa_sopir' => $v->harga_sewa_tanpa_sopir_per_hari,
                         'harga_dengan_sopir' => $v->harga_sewa_dengan_sopir_per_hari,
+                        'has_sopir' => (bool) $v->sopir,
                     ];
                 @endphp
                 <div @click="$dispatch('pick-vehicle', @js($vehiclePickerData))"
@@ -540,7 +589,7 @@
                     :class="window.__bookingData.selectedVehicleId === {{ $v->id }} ? 'border-blue-900 bg-blue-50' : ''">
                     <div class="mb-3 overflow-hidden rounded-lg bg-slate-100">
                         @if ($v->foto)
-                            <img src="{{ Storage::url($v->foto) }}" alt="{{ $v->nama }}" class="h-40 w-full object-cover">
+                            <img src="{{ $v->foto_url }}" alt="{{ $v->nama }}" class="h-40 w-full object-cover">
                         @else
                             <div class="flex h-40 w-full items-center justify-center">
                                 <i class="fas fa-car text-4xl text-slate-300"></i>
@@ -551,7 +600,14 @@
                     <p class="font-[IBM_Plex_Mono] text-sm text-slate-600">{{ $v->plat_nomor }}</p>
                     <p class="text-xs capitalize text-slate-500">{{ $v->jenis }}</p>
                     @if ($v->sopir)
-                        <p class="mt-1 text-xs text-slate-500"><i class="fas fa-user-tie mr-1"></i>{{ $v->sopir->name }}</p>
+                        <span class="mt-1 inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-medium text-blue-700">
+                            <i class="fas fa-user-tie"></i>Dengan Sopir
+                        </span>
+                        <p class="mt-1 text-xs text-slate-500"><i class="fas fa-user mr-1"></i>{{ $v->sopir->name }}</p>
+                    @else
+                        <span class="mt-1 inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-500">
+                            <i class="fas fa-user-slash"></i>Tanpa Sopir
+                        </span>
                     @endif
                     <p class="mt-2 font-[IBM_Plex_Mono] text-base font-bold text-blue-900">
                         Rp {{ number_format($v->harga_sewa_tanpa_sopir_per_hari, 0, ',', '.') }} <span class="text-xs font-normal text-slate-400">tanpa / hari</span>

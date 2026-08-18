@@ -33,17 +33,15 @@ class RouteSeeder extends Seeder
             return;
         }
 
-        // 10 rute travel Flores paling populer
+        // 8 rute travel — semua lewat Ende (hub): armada mitra hanya melayani rute dari/ke Ende
         // Format: [origin, destination, price, duration_minutes, distance_km, description]
         $rutes = [
-            ['Ende', 'Labuan Bajo',  200000, 360,  340, 'Traverse pesisir selatan Flores menuju gerbang Komodo.'],
-            ['Labuan Bajo', 'Ende',  200000, 360,  340, 'Balik dari gerbang Komodo ke Kota Pancasila.'],
+            ['Ende', 'Mbay',        200000, 360,  300, 'Rute pesisir selatan Flores menuju Mbay, Nagekeo.'],
+            ['Mbay', 'Ende',        200000, 360,  300, 'Balik dari Mbay ke Kota Pancasila Ende.'],
             ['Maumere', 'Ende',      100000, 180,  130, 'Rute pesisir utara, surga bawah laut menuju kota sejarah.'],
             ['Ende', 'Maumere',      100000, 180,  130, 'Dari Kota Pancasila ke Teluk Maumere.'],
             ['Ruteng', 'Ende',       130000, 240,  180, 'Dari Kota Dingin ke Kota Pancasila lewat pesisir selatan.'],
             ['Ende', 'Ruteng',       130000, 240,  180, 'Balik dari Ende ke Kota Dingin.'],
-            ['Ruteng', 'Labuan Bajo',180000, 240,  200, 'Dari Kota Dingin ke gerbang Komodo.'],
-            ['Labuan Bajo', 'Ruteng',180000, 240,  200, 'Dari gerbang Komodo ke Kota Dingin.'],
             ['Bajawa', 'Ende',       150000, 240,  170, 'Dari Kota Adat Bajawa ke Kota Pancasila Ende.'],
             ['Ende', 'Bajawa',       150000, 240,  170, 'Dari Ende ke Bajawa — kota adat Ngada.'],
         ];

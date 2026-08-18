@@ -70,6 +70,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::post('/bookings/{booking}/refund', [BookingController::class, 'refund'])->name('admin.bookings.refund');
     Route::post('/bookings/{booking}/refund/approve', [BookingController::class, 'approveRefund'])->name('admin.bookings.refund.approve');
     Route::post('/bookings/{booking}/refund/reject', [BookingController::class, 'rejectRefund'])->name('admin.bookings.refund.reject');
+    Route::post('/bookings/{booking}/mark-paid', [BookingController::class, 'markAsFullyPaid'])->name('admin.bookings.mark-paid');
     Route::get('/mitras', [MitraManagementController::class, 'index'])->name('admin.mitras.index');
     Route::post('/mitras', [MitraManagementController::class, 'store'])->name('admin.mitras.store');
     Route::get('/revenue-shares', [RevenueShareController::class, 'index'])->name('admin.revenue-shares.index');

@@ -78,7 +78,7 @@
                         <label class="mb-1.5 block text-sm font-medium text-slate-700">Foto Kendaraan</label>
                         <div class="flex items-center gap-3">
                             @if ($vehicle->foto)
-                                <img src="{{ Storage::url($vehicle->foto) }}" alt="{{ $vehicle->nama }}" class="h-16 w-16 rounded-xl object-cover border border-slate-200">
+                                <img src="{{ $vehicle->foto_url }}" alt="{{ $vehicle->nama }}" class="h-16 w-16 rounded-xl object-cover border border-slate-200">
                             @endif
                             <label class="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-300 px-4 py-2.5 text-sm text-slate-600 transition hover:border-[#3F7D6C] hover:bg-slate-50">
                                 <svg class="h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">

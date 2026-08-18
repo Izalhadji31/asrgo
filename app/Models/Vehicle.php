@@ -9,6 +9,15 @@ class Vehicle extends Model
 {
     use HasFactory;
 
+    public function getFotoUrlAttribute(): string
+    {
+        if (! $this->foto) {
+            return '';
+        }
+
+        return str_starts_with($this->foto, 'http') ? $this->foto : \Illuminate\Support\Facades\Storage::url($this->foto);
+    }
+
     protected $fillable = [
         'mitra_id',
         'sopir_id',

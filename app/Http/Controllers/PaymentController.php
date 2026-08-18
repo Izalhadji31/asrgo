@@ -17,7 +17,7 @@ class PaymentController extends Controller
         private readonly PaymentService $paymentService,
     ) {}
 
-    public function show(Booking $booking): View|Response
+    public function show(Request $request, Booking $booking): View|Response
     {
         $this->ensureCustomerOwnsBooking($booking);
 
@@ -31,21 +31,43 @@ class PaymentController extends Controller
 
         $this->authorize('pay', $booking);
 
-        $error = null;
-        try {
-            $booking = $this->paymentService->createSnapTransaction($booking);
-        } catch (Throwable $exception) {
-            Log::error('Unable to prepare booking payment.', [
-                'booking_id' => $booking->id,
-                'exception' => $exception,
-            ]);
-            $error = $exception->getMessage();
+        $scheme = (string) $request->query('scheme', '');
+        if (! in_array($scheme, [Booking::PAYMENT_SCHEME_DP, Booking::PAYMENT_SCHEME_FULL], true)) {
+            $scheme = '';
         }
 
+        $error = null;
+        $snapToken = null;
+
+        // Token masih valid — jangan buat transaksi baru, tampilkan token yang ada.
+        $hasActiveToken = $booking->payment_status === Booking::PAYMENT_PENDING
+            && $booking->payment_token
+            && (! $booking->payment_expired_at || $booking->payment_expired_at->isFuture());
+
+        if ($hasActiveToken) {
+            $snapToken = $booking->payment_token;
+        } elseif ($scheme !== '' || $booking->service_type === 'travel') {
+            // Travel selalu lunas; rental bisa DP 30% atau lunas sesuai pilihan user.
+            $useScheme = $scheme !== '' ? $scheme : Booking::PAYMENT_SCHEME_FULL;
+            try {
+                $booking = $this->paymentService->createSnapTransaction($booking, $useScheme);
+                $snapToken = $booking->payment_token;
+            } catch (Throwable $exception) {
+                Log::error('Unable to prepare booking payment.', [
+                    'booking_id' => $booking->id,
+                    'exception' => $exception,
+                ]);
+                $error = $exception->getMessage();
+            }
+        }
+
+        $booking = $booking->fresh();
+
         return view('payments.show', [
-            'booking' => $booking->fresh(),
-            'snapToken' => $booking->payment_token,
+            'booking' => $booking,
+            'snapToken' => $snapToken,
             'error' => $error,
+            'scheme' => $booking?->payment_scheme ?? ($scheme !== '' ? $scheme : null),
         ]);
     }
 
