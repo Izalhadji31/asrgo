@@ -65,6 +65,8 @@ class BookingController extends Controller
             Booking::PAYMENT_EXPIRED,
         ], true) ? $paymentStatus : null;
 
+        $search = trim((string) $request->query('q', ''));
+
         $ticketCounts = [
             'all' => (clone $bookingsQuery)->count(),
             Booking::TICKET_NOT_CREATED => (clone $bookingsQuery)->where('ticket_status', Booking::TICKET_NOT_CREATED)->count(),
@@ -83,6 +85,14 @@ class BookingController extends Controller
         $bookings = (clone $bookingsQuery)
             ->when($ticketStatus, fn ($query) => $query->where('ticket_status', $ticketStatus))
             ->when($paymentStatus, fn ($query) => $query->where('payment_status', $paymentStatus))
+            ->when($search !== '', function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('id', 'like', "%{$search}%")
+                        ->orWhere('ticket_number', 'like', "%{$search}%")
+                        ->orWhereHas('pelanggan', fn ($q2) => $q2->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"))
+                        ->orWhereHas('vehicle', fn ($q2) => $q2->where('nama', 'like', "%{$search}%")->orWhere('plat_nomor', 'like', "%{$search}%"));
+                });
+            })
             ->paginate(20)
             ->withQueryString();
 
@@ -92,6 +102,7 @@ class BookingController extends Controller
             'activeTicketStatus' => $ticketStatus,
             'activePaymentStatus' => $paymentStatus,
             'paymentCounts' => $paymentCounts,
+            'search' => $search,
             'drivers' => User::where('role', 'driver')->get(),
             'vehicles' => Vehicle::with('sopir')->where('is_approved', true)->where('status', 'tersedia')->get(),
         ]);

@@ -38,6 +38,7 @@
                     ['label' => 'Kelola Rute', 'icon' => 'fa-solid fa-route', 'route' => 'admin.routes.index', 'active' => ['admin.routes.index', 'admin.routes.*']],
                     ['label' => 'Kelola Mitra', 'icon' => 'fa-solid fa-handshake', 'route' => 'admin.mitras.index', 'active' => ['admin.mitras.index', 'admin.mitras.*', 'admin.vehicles.*']],
                     ['label' => 'Kelola Sopir', 'icon' => 'fa-solid fa-user-tie', 'route' => 'admin.drivers.index', 'active' => ['admin.drivers.index', 'admin.drivers.*']],
+                    ['label' => 'Kelola Pengguna', 'icon' => 'fa-solid fa-users', 'route' => 'admin.users.index', 'active' => ['admin.users.index']],
                     ['label' => 'Bagi Hasil', 'icon' => 'fa-solid fa-coins', 'route' => 'admin.revenue-shares.index', 'active' => ['admin.revenue-shares.index', 'admin.revenue-shares.*']],
                     ['label' => 'Laporan Keuangan', 'icon' => 'fa-solid fa-file-invoice-dollar', 'route' => 'admin.reports.index', 'active' => ['admin.reports.index']],
                     ['label' => 'Ulasan', 'icon' => 'fa-solid fa-star', 'route' => 'admin.reviews.index', 'active' => ['admin.reviews.index']],

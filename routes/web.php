@@ -15,6 +15,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\RevenueShareController;
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\RouteController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\VehicleController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -65,6 +66,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::post('/vehicles/{vehicle}/assign-driver', [VehicleController::class, 'assignDriver'])->name('admin.vehicles.assign-driver');
     Route::get('/drivers', [DriverManagementController::class, 'index'])->name('admin.drivers.index');
     Route::post('/drivers', [DriverManagementController::class, 'store'])->name('admin.drivers.store');
+    Route::get('/users', [UserController::class, 'index'])->name('admin.users.index');
+    Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('admin.users.reset-password');
     Route::get('/financial-reports', [FinancialReportController::class, 'index'])->name('admin.reports.index');
     Route::get('/financial-reports/cetak', [FinancialReportController::class, 'printReport'])->name('admin.reports.print');
     Route::get('/reviews', [ReviewController::class, 'index'])->name('admin.reviews.index');

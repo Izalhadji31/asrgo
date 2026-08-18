@@ -59,6 +59,10 @@
         </div>
 
         <form method="GET" action="{{ route('admin.bookings.index') }}" class="flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:flex-row sm:items-end">
+            <div class="flex-[2]">
+                <label for="q" class="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-400">Cari Booking</label>
+                <input id="q" name="q" type="text" value="{{ $search }}" placeholder="No. booking, nama/email customer, plat/nama kendaraan, no. tiket" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700">
+            </div>
             <div class="flex-1">
                 <label for="payment_status" class="mb-1 block text-xs font-semibold uppercase tracking-wide text-slate-400">Filter Pembayaran</label>
                 <select id="payment_status" name="payment_status" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700">
