@@ -51,6 +51,7 @@
                         <th class="px-5 py-3 font-medium">Nama</th>
                         <th class="px-5 py-3 font-medium">Email</th>
                         <th class="px-5 py-3 font-medium">Role</th>
+                        <th class="px-5 py-3 font-medium">Status</th>
                         <th class="px-5 py-3 font-medium">Terdaftar</th>
                         <th class="px-5 py-3 font-medium">Aksi</th>
                     </tr>
@@ -64,22 +65,43 @@
                             <td class="px-5 py-4">
                                 <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $rl['class'] }}">{{ $rl['label'] }}</span>
                             </td>
+                            <td class="px-5 py-4">
+                                @if ($user->is_active)
+                                    <span class="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-700">Aktif</span>
+                                @else
+                                    <span class="rounded-full bg-red-100 px-3 py-1 text-xs font-semibold text-red-700">Nonaktif</span>
+                                @endif
+                            </td>
                             <td class="px-5 py-4 text-slate-600">{{ $user->created_at?->translatedFormat('d M Y') }}</td>
                             <td class="px-5 py-4">
-                                <details class="text-left">
-                                    <summary class="cursor-pointer text-xs font-medium text-[#E8A33D]">Reset Password</summary>
-                                    <form action="{{ route('admin.users.reset-password', $user) }}" method="POST" class="mt-2 w-72 space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
+                                <div class="flex flex-wrap items-center gap-3">
+                                @if ($user->id === Auth::id())
+                                    <span class="text-xs text-slate-400">Akun Anda</span>
+                                @else
+                                    <details class="text-left">
+                                        <summary class="cursor-pointer text-xs font-medium text-[#E8A33D]">Reset Password</summary>
+                                        <form action="{{ route('admin.users.reset-password', $user) }}" method="POST" class="mt-2 w-72 space-y-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
+                                            @csrf
+                                            <input type="password" name="password" minlength="8" required placeholder="Password baru (min 8 karakter)" class="w-full rounded-lg border border-amber-200 px-2 py-1.5 text-xs text-slate-700">
+                                            <input type="password" name="password_confirmation" minlength="8" required placeholder="Ulangi password" class="w-full rounded-lg border border-amber-200 px-2 py-1.5 text-xs text-slate-700">
+                                            <button type="submit" class="rounded-lg bg-[#E8A33D] px-3 py-1.5 text-xs font-semibold text-blue-900 transition hover:opacity-90">Simpan Password Baru</button>
+                                        </form>
+                                    </details>
+                                    <form action="{{ route('admin.users.toggle-active', $user) }}" method="POST" onsubmit="return confirm('{{ $user->is_active ? 'Nonaktifkan' : 'Aktifkan' }} user ini?')">
                                         @csrf
-                                        <input type="password" name="password" minlength="8" required placeholder="Password baru (min 8 karakter)" class="w-full rounded-lg border border-amber-200 px-2 py-1.5 text-xs text-slate-700">
-                                        <input type="password" name="password_confirmation" minlength="8" required placeholder="Ulangi password" class="w-full rounded-lg border border-amber-200 px-2 py-1.5 text-xs text-slate-700">
-                                        <button type="submit" class="rounded-lg bg-[#E8A33D] px-3 py-1.5 text-xs font-semibold text-blue-900 transition hover:opacity-90">Simpan Password Baru</button>
+                                        @if ($user->is_active)
+                                            <button class="rounded-lg border border-red-200 px-3 py-1.5 text-xs font-medium text-red-600 transition hover:bg-red-50">Nonaktifkan</button>
+                                        @else
+                                            <button class="rounded-lg border border-green-200 px-3 py-1.5 text-xs font-medium text-green-600 transition hover:bg-green-50">Aktifkan</button>
+                                        @endif
                                     </form>
-                                </details>
+                                @endif
+                                </div>
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="5" class="px-5 py-12 text-center text-sm text-slate-500">Tidak ada pengguna ditemukan.</td>
+                            <td colspan="6" class="px-5 py-12 text-center text-sm text-slate-500">Tidak ada pengguna ditemukan.</td>
                         </tr>
                     @endforelse
                 </tbody>

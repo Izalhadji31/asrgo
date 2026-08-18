@@ -69,6 +69,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::post('/drivers', [DriverManagementController::class, 'store'])->name('admin.drivers.store');
     Route::get('/users', [UserController::class, 'index'])->name('admin.users.index');
     Route::post('/users/{user}/reset-password', [UserController::class, 'resetPassword'])->name('admin.users.reset-password');
+    Route::post('/users/{user}/toggle-active', [UserController::class, 'toggleActive'])->name('admin.users.toggle-active');
     Route::get('/financial-reports', [FinancialReportController::class, 'index'])->name('admin.reports.index');
     Route::get('/financial-reports/cetak', [FinancialReportController::class, 'printReport'])->name('admin.reports.print');
     Route::get('/reviews', [ReviewController::class, 'index'])->name('admin.reviews.index');

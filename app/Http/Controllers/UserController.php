@@ -6,6 +6,7 @@ use App\Models\AuditLog;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -31,6 +32,32 @@ class UserController extends Controller
             ->withQueryString();
 
         return view('admin.users.index', compact('users', 'search', 'role'));
+    }
+
+    public function toggleActive(User $user)
+    {
+        if (Auth::user()->role !== 'admin') {
+            abort(403);
+        }
+
+        if ($user->id === Auth::id()) {
+            return back()->withErrors(['user' => 'Anda tidak dapat menonaktifkan akun sendiri.']);
+        }
+
+        $user->update(['is_active' => ! $user->is_active]);
+
+        if (! $user->is_active) {
+            DB::table('sessions')->where('user_id', $user->id)->delete();
+        }
+
+        AuditLog::record(
+            $user->is_active ? 'activate_user' : 'deactivate_user',
+            ($user->is_active ? 'Mengaktifkan' : 'Menonaktifkan').' user '.$user->name.' ('.$user->email.')',
+            User::class,
+            $user->id
+        );
+
+        return back()->with('success', 'Status user '.$user->name.' berhasil diperbarui.');
     }
 
     public function resetPassword(Request $request, User $user)
