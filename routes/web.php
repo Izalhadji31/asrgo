@@ -83,6 +83,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::post('/bookings/{booking}/mark-paid', [BookingController::class, 'markAsFullyPaid'])->name('admin.bookings.mark-paid');
     Route::post('/bookings/{booking}/cancel', [BookingController::class, 'adminCancel'])->name('admin.bookings.cancel');
     Route::post('/bookings/{booking}/update', [BookingController::class, 'updateDetails'])->name('admin.bookings.update');
+    Route::post('/driver-reports/{report}/resolve', [BookingController::class, 'resolveDriverReport'])->name('admin.driver-reports.resolve');
     Route::get('/mitras', [MitraManagementController::class, 'index'])->name('admin.mitras.index');
     Route::post('/mitras', [MitraManagementController::class, 'store'])->name('admin.mitras.store');
     Route::get('/revenue-shares', [RevenueShareController::class, 'index'])->name('admin.revenue-shares.index');
@@ -119,6 +120,7 @@ Route::middleware(['auth', 'role:driver'])->prefix('driver')->group(function () 
     Route::post('/bookings/{booking}/accept', [BookingController::class, 'acceptAssignment'])->name('driver.bookings.accept');
     Route::post('/bookings/{booking}/reject', [BookingController::class, 'rejectAssignment'])->name('driver.bookings.reject');
     Route::post('/bookings/{booking}/start', [BookingController::class, 'startTrip'])->name('driver.bookings.start');
+    Route::post('/bookings/{booking}/report', [BookingController::class, 'reportIssue'])->name('driver.bookings.report');
 });
 
 Route::middleware(['auth', 'role:customer'])->prefix('customer')->group(function () {

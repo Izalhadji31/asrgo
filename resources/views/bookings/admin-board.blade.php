@@ -122,6 +122,9 @@
                                          @elseif ($booking->sopir_id && $booking->driver_confirmed_at)
                                              <span class="rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">Sopir dikonfirmasi</span>
                                          @endif
+                                         @if ($booking->driverReports->where('status', 'open')->count())
+                                             <span class="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-700">Ada kendala</span>
+                                         @endif
                                      </div>
                                  </td>
                                  <td class="px-5 py-4">
@@ -356,6 +359,25 @@
                         <ul class="mt-1 space-y-1 text-sm text-slate-700">
                             @foreach ($booking->passengers as $passenger)
                             <li>{{ $loop->iteration }}. {{ $passenger->nama }} <span class="text-slate-400">({{ $passenger->no_hp }})</span></li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    @endif
+
+                    @if ($booking->driverReports->where('status', 'open')->count())
+                    <div class="sm:col-span-2 rounded-lg border border-red-200 bg-red-50 p-4">
+                        <p class="text-xs font-medium uppercase tracking-wide text-red-500">Laporan Kendala Sopir</p>
+                        <ul class="mt-2 space-y-3 text-sm">
+                            @foreach ($booking->driverReports->where('status', 'open') as $report)
+                            <li class="rounded-lg border border-red-100 bg-white p-3">
+                                <p class="font-semibold text-red-700">{{ $report->driver?->name }} — {{ $report->kategori }}</p>
+                                <p class="mt-1 text-slate-600">{{ $report->keterangan }}</p>
+                                <p class="mt-1 text-xs text-slate-400">{{ $report->created_at?->translatedFormat('d M Y H:i') }}</p>
+                                <form action="{{ route('admin.driver-reports.resolve', $report) }}" method="POST" class="mt-2">
+                                    @csrf
+                                    <button class="rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-emerald-700">Tandai Selesai</button>
+                                </form>
+                            </li>
                             @endforeach
                         </ul>
                     </div>

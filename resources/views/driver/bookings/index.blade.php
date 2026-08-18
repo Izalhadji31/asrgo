@@ -133,6 +133,21 @@
                                                 @csrf
                                                 <button class="rounded-lg bg-green-600 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-green-700">Selesai</button>
                                             </form>
+                                            <details class="text-left">
+                                                <summary class="cursor-pointer text-xs font-medium text-red-600">Lapor Kendala</summary>
+                                                <form action="{{ route('driver.bookings.report', $booking) }}" method="POST" class="mt-2 w-64 space-y-2 rounded-lg border border-red-100 bg-red-50 p-3">
+                                                    @csrf
+                                                    <select name="kategori" class="w-full rounded-lg border border-red-200 px-2 py-1.5 text-xs text-slate-700" required>
+                                                        <option value="">Pilih kategori</option>
+                                                        <option value="kendaraan">Kendaraan bermasalah</option>
+                                                        <option value="macet">Kemacetan / keterlambatan</option>
+                                                        <option value="no_show">Penumpang tidak hadir</option>
+                                                        <option value="lainnya">Lainnya</option>
+                                                    </select>
+                                                    <textarea name="keterangan" rows="2" minlength="5" maxlength="1000" required placeholder="Keterangan kendala (min. 5 karakter)" class="w-full rounded-lg border border-red-200 px-2 py-1.5 text-xs text-slate-700"></textarea>
+                                                    <button class="rounded-lg bg-red-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-red-700">Kirim Laporan</button>
+                                                </form>
+                                            </details>
                                             @endif
                                         @else
                                             <span class="text-xs text-slate-400">—</span>

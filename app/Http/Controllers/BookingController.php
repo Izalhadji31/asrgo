@@ -6,6 +6,7 @@ use App\Http\Requests\AssignDriverRequest;
 use App\Http\Requests\StoreBookingRequest;
 use App\Models\AuditLog;
 use App\Models\Booking;
+use App\Models\DriverReport;
 use App\Models\Route;
 use App\Models\TravelDeparture;
 use App\Models\User;
@@ -137,7 +138,7 @@ class BookingController extends Controller
 
     public function adminBoard(Request $request)
     {
-        $bookingsQuery = Booking::with(['vehicle', 'pelanggan', 'sopir', 'passengers'])->latest();
+        $bookingsQuery = Booking::with(['vehicle', 'pelanggan', 'sopir', 'passengers', 'driverReports.driver'])->latest();
         $ticketStatus = $request->query('ticket_status');
         $ticketStatus = in_array($ticketStatus, [Booking::TICKET_NOT_CREATED, Booking::TICKET_CREATED], true)
             ? $ticketStatus
@@ -586,6 +587,64 @@ class BookingController extends Controller
         $this->bookingService->markCompleted($booking);
 
         return redirect()->back()->with('success', 'Booking selesai dan payout dibuat.');
+    }
+
+    public function reportIssue(Request $request, Booking $booking)
+    {
+        if (Auth::user()->role !== 'driver' || $booking->sopir_id !== Auth::id()) {
+            abort(403);
+        }
+
+        if (in_array($booking->status, [Booking::STATUS_CANCELLED, Booking::STATUS_COMPLETED], true)) {
+            return back()->withErrors(['booking' => 'Booking sudah selesai atau dibatalkan.']);
+        }
+
+        $validated = $request->validate([
+            'kategori' => ['required', 'in:kendaraan,macet,no_show,lainnya'],
+            'keterangan' => ['required', 'string', 'min:5', 'max:1000'],
+        ]);
+
+        $kategoriLabels = [
+            'kendaraan' => 'kendaraan bermasalah',
+            'macet' => 'kemacetan / keterlambatan',
+            'no_show' => 'penumpang tidak hadir',
+            'lainnya' => 'kendala lain',
+        ];
+
+        $report = DriverReport::create([
+            'booking_id' => $booking->id,
+            'driver_id' => Auth::id(),
+            'kategori' => $validated['kategori'],
+            'keterangan' => $validated['keterangan'],
+            'status' => 'open',
+        ]);
+
+        foreach (User::where('role', 'admin')->pluck('id') as $adminId) {
+            $this->notificationService->log(
+                $adminId,
+                'driver_reported',
+                'Sopir '.Auth::user()->name.' melaporkan '.($kategoriLabels[$validated['kategori']] ?? $validated['kategori']).' pada booking #'.$booking->id.'.',
+                DriverReport::class,
+                $report->id
+            );
+        }
+
+        return back()->with('success', 'Kendala dilaporkan. Admin akan segera menindaklanjuti.');
+    }
+
+    public function resolveDriverReport(DriverReport $report)
+    {
+        if (Auth::user()->role !== 'admin') {
+            abort(403);
+        }
+
+        if ($report->status !== 'resolved') {
+            $report->update(['status' => 'resolved']);
+
+            AuditLog::record('resolve_driver_report', 'Menandai selesai laporan kendala #'.$report->id.' (booking #'.$report->booking_id.')', DriverReport::class, $report->id);
+        }
+
+        return back()->with('success', 'Laporan kendala ditandai selesai.');
     }
 
     public function startTrip(Booking $booking)

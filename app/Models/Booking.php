@@ -130,6 +130,11 @@ class Booking extends Model
         return $this->hasMany(BookingPassenger::class)->orderBy('urutan');
     }
 
+    public function driverReports()
+    {
+        return $this->hasMany(DriverReport::class);
+    }
+
     public function departed(): ?TravelDeparture
     {
         if ($this->service_type !== 'travel' || ! $this->route_id || ! $this->vehicle_id) {
