@@ -92,6 +92,22 @@
                     <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Catatan</dt>
                     <dd class="mt-1 text-sm text-slate-700">{{ $booking->notes ?: '-' }}</dd>
                 </div>
+                @if ($booking->service_type === 'travel' && $booking->passengers->count())
+                <div class="sm:col-span-2">
+                    <dt class="text-xs font-medium uppercase tracking-wide text-slate-400">Data Penumpang</dt>
+                    <dd class="mt-1">
+                        <ol class="space-y-1.5">
+                            @foreach ($booking->passengers as $passenger)
+                            <li class="flex items-center gap-2 text-sm">
+                                <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-100 text-xs font-semibold text-slate-500">{{ $loop->iteration }}</span>
+                                <span class="font-medium text-slate-700">{{ $passenger->nama }}</span>
+                                <span class="text-slate-400">{{ $passenger->no_hp }}</span>
+                            </li>
+                            @endforeach
+                        </ol>
+                    </dd>
+                </div>
+                @endif
             </dl>
         </div>
 

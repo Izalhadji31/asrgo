@@ -339,6 +339,17 @@
                         <p class="mt-1 text-sm text-slate-700">{{ $booking->notes }}</p>
                     </div>
                     @endif
+
+                    @if ($booking->service_type === 'travel' && $booking->passengers->count())
+                    <div class="sm:col-span-2">
+                        <p class="text-xs font-medium uppercase tracking-wide text-slate-400">Data Penumpang</p>
+                        <ul class="mt-1 space-y-1 text-sm text-slate-700">
+                            @foreach ($booking->passengers as $passenger)
+                            <li>{{ $loop->iteration }}. {{ $passenger->nama }} <span class="text-slate-400">({{ $passenger->no_hp }})</span></li>
+                            @endforeach
+                        </ul>
+                    </div>
+                    @endif
                 </div>
 
                 @if (!in_array($booking->status, ['completed', 'cancelled']))

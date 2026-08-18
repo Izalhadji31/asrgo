@@ -40,6 +40,9 @@ class StoreBookingRequest extends FormRequest
             'session'         => ['required_if:service_type,travel', 'nullable', 'in:pagi,siang'],
             'with_driver'     => ['nullable', 'boolean'],
             'duration'        => ['required_if:service_type,rental', 'nullable', 'numeric', 'in:0.5,1,2,3,4,5,6,7'],
+            'passengers'      => ['nullable', 'array', 'min:1'],
+            'passengers.*.nama' => ['required', 'string', 'max:100'],
+            'passengers.*.no_hp' => ['required', 'string', 'max:20'],
         ];
     }
 
@@ -57,12 +60,24 @@ class StoreBookingRequest extends FormRequest
             'jumlah_penumpang.min'               => 'Jumlah penumpang minimal 1 orang.',
             'session.in'                         => 'Sesi keberangkatan tidak valid. Pilih sesi Pagi atau Siang.',
             'session.required_if'                => 'Pilih sesi keberangkatan.',
+            'passengers.min'                     => 'Minimal satu penumpang harus diisi.',
+            'passengers.*.nama.required'         => 'Nama penumpang wajib diisi.',
+            'passengers.*.no_hp.required'        => 'Nomor HP penumpang wajib diisi.',
         ];
     }
 
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
+            if ($this->input('service_type') === 'travel') {
+                $passengers = $this->input('passengers', []);
+                $passengerCount = (int) $this->input('jumlah_penumpang', 0);
+
+                if ($passengerCount > 0 && count($passengers) !== $passengerCount) {
+                    $validator->errors()->add('passengers', 'Jumlah data penumpang harus sama dengan jumlah penumpang yang dipilih.');
+                }
+            }
+
             if ($this->input('service_type') !== 'travel') {
                 return;
             }

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Booking;
+use App\Models\BookingPassenger;
 use App\Models\Route;
 use App\Models\RouteAssignment;
 use App\Models\TravelDeparture;
@@ -101,6 +102,7 @@ class BookingService
         bool $withDriver = true,
         float $durationDays = 1,
         int $passengerCount = 1,
+        array $passengers = [],
     ): Booking {
         return DB::transaction(function () use (
             $customerId,
@@ -117,6 +119,7 @@ class BookingService
             $withDriver,
             $durationDays,
             $passengerCount,
+            $passengers,
         ): Booking {
             if ($serviceType === 'rental' && !$vehicleId) {
                 throw ValidationException::withMessages([
@@ -186,6 +189,17 @@ class BookingService
 
             $serviceLabel = $serviceType === 'travel' ? 'Travel' : 'Rental';
             $customerName = $booking->pelanggan?->name ?? 'Customer #'.$customerId;
+
+            if ($serviceType === 'travel' && $passengers) {
+                foreach ($passengers as $index => $passenger) {
+                    BookingPassenger::create([
+                        'booking_id' => $booking->id,
+                        'nama' => trim((string) ($passenger['nama'] ?? '')),
+                        'no_hp' => trim((string) ($passenger['no_hp'] ?? '')),
+                        'urutan' => $index + 1,
+                    ]);
+                }
+            }
 
             foreach (User::where('role', 'admin')->pluck('id') as $adminId) {
                 $this->notificationService->log(

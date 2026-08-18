@@ -120,6 +120,11 @@ class Booking extends Model
         return $this->hasOne(Review::class);
     }
 
+    public function passengers()
+    {
+        return $this->hasMany(BookingPassenger::class)->orderBy('urutan');
+    }
+
     public function departed(): ?TravelDeparture
     {
         if ($this->service_type !== 'travel' || ! $this->route_id || ! $this->vehicle_id) {

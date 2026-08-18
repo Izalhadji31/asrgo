@@ -12,6 +12,8 @@
             initialDuration: @json(old('duration')),
             initialTravelDate: @json(old('tanggal_mulai')),
             initialPassengerCount: @json(old('jumlah_penumpang', 1)),
+            initialPassengers: @json(old('passengers')),
+            userName: @json(Auth::user()->name),
             initialWithDriver: @json(old('with_driver', '1')),
             routeAssignments: @json($routeAssignments),
             routesData: @json($routesData),
@@ -43,6 +45,9 @@
          selectedVehicleHargaDenganSopir: 0,
          selectedDuration: window.__bookingData.initialDuration,
          passengerCount: Number(window.__bookingData.initialPassengerCount),
+         passengers: window.__bookingData.initialPassengers && window.__bookingData.initialPassengers.length
+             ? window.__bookingData.initialPassengers.map(p => ({ nama: p.nama || '', no_hp: p.no_hp || '' }))
+             : [{ nama: window.__bookingData.userName || '', no_hp: '' }],
           travelDate: window.__bookingData.initialTravelDate,
          get routeOrigins() {
              return [...new Set(window.__bookingData.routesData.map(route => route.origin))].sort();
@@ -253,6 +258,15 @@
          updatePassengerCount(count) {
              this.passengerCount = Number(count || 1);
 
+             const target = Math.max(1, this.passengerCount);
+             if (target > this.passengers.length) {
+                 for (let i = this.passengers.length; i < target; i++) {
+                     this.passengers.push({ nama: '', no_hp: '' });
+                 }
+             } else if (target < this.passengers.length) {
+                 this.passengers = this.passengers.slice(0, target);
+             }
+
              if (this.selectedRouteSession && !this.isSessionAvailable(this.selectedRouteSession)) {
                  this.selectedRouteSession = null;
                  this.selectedRouteVehicle = null;
@@ -407,9 +421,23 @@
                          </div>
                          <p class="mt-1 text-xs text-slate-500">Kendaraan akan dipilih otomatis sesuai kapasitas dan antrean armada.</p>
                          @error('jumlah_penumpang') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
-                     </div>
+                         </div>
 
-                    {{-- Available Sessions (Travel) --}}
+                         {{-- Passenger Manifest (Travel) --}}
+                         <div x-show="serviceType === 'travel' && selectedRouteId" class="md:col-span-2">
+                         <label class="mb-1.5 block text-sm font-medium text-slate-700">Data Penumpang</label>
+                         <p class="mb-2 text-xs text-slate-500">Penumpang pertama mengikuti akun Anda. Isi nama dan nomor HP setiap penumpang.</p>
+                         <template x-for="(p, i) in passengers" :key="i">
+                             <div class="mb-2 flex flex-col gap-2 rounded-xl border border-slate-200 bg-slate-50 p-3 sm:flex-row sm:items-center">
+                                 <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-900 text-xs font-semibold text-white" x-text="i + 1"></span>
+                                 <input type="text" :name="`passengers[${i}][nama]`" x-model="passengers[i].nama" placeholder="Nama penumpang" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700" :required="serviceType === 'travel'">
+                                 <input type="text" :name="`passengers[${i}][no_hp]`" x-model="passengers[i].no_hp" placeholder="No. HP (contoh: 081234567890)" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-700" :required="serviceType === 'travel'">
+                             </div>
+                         </template>
+                         @error('passengers') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                         </div>
+
+                         {{-- Available Sessions (Travel) --}}
                     <div x-show="serviceType === 'travel' && selectedRouteId" class="md:col-span-2">
                         <label class="mb-1.5 block text-sm font-medium text-slate-700">Pilih Jam Keberangkatan</label>
                          <template x-if="sessionOptions.length > 0">

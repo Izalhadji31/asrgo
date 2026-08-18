@@ -51,7 +51,7 @@ class BookingController extends Controller
 
     public function adminBoard(Request $request)
     {
-        $bookingsQuery = Booking::with(['vehicle', 'pelanggan', 'sopir'])->latest();
+        $bookingsQuery = Booking::with(['vehicle', 'pelanggan', 'sopir', 'passengers'])->latest();
         $ticketStatus = $request->query('ticket_status');
         $ticketStatus = in_array($ticketStatus, [Booking::TICKET_NOT_CREATED, Booking::TICKET_CREATED], true)
             ? $ticketStatus
@@ -233,7 +233,7 @@ class BookingController extends Controller
     {
         $this->authorize('view', $booking);
 
-        $booking->load(['vehicle', 'sopir', 'pelanggan', 'review']);
+        $booking->load(['vehicle', 'sopir', 'pelanggan', 'review', 'passengers']);
 
         return view('customer.bookings.show', compact('booking'));
     }
@@ -273,6 +273,7 @@ class BookingController extends Controller
             withDriver: $request->boolean('with_driver', true),
             durationDays: $duration,
             passengerCount: (int) ($request->jumlah_penumpang ?: 1),
+            passengers: $request->input('passengers', []),
         );
 
         return redirect()->route('payments.show', $booking)->with('success', 'Booking berhasil dibuat. Selesaikan pembayaran untuk melanjutkan.');
