@@ -8,9 +8,10 @@ use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Seeder idempotent untuk rute travel Flores.
+ * Seeder idempotent untuk rute travel CV. IzalhadjiTravel.
  * Dihapus dulu semua data lama (travel_departures, route_assignments, routes)
  * lalu insert ulang dari skripsi hardcoded array.
+ * 2 Okt 2026: rute disesuaikan data riil — HANYA Ende <-> Mbay (2 arah), 2 sesi.
  *
  * Jalankan: php artisan db:seed --class=RouteSeeder
  */
@@ -33,17 +34,11 @@ class RouteSeeder extends Seeder
             return;
         }
 
-        // 8 rute travel — semua lewat Ende (hub): armada mitra hanya melayani rute dari/ke Ende
+        // 2 rute travel (data riil): hanya Ende <-> Mbay, dua arah
         // Format: [origin, destination, price, duration_minutes, distance_km, description]
         $rutes = [
             ['Ende', 'Mbay',        200000, 360,  300, 'Rute pesisir selatan Flores menuju Mbay, Nagekeo.'],
             ['Mbay', 'Ende',        200000, 360,  300, 'Balik dari Mbay ke Kota Pancasila Ende.'],
-            ['Maumere', 'Ende',      100000, 180,  130, 'Rute pesisir utara, surga bawah laut menuju kota sejarah.'],
-            ['Ende', 'Maumere',      100000, 180,  130, 'Dari Kota Pancasila ke Teluk Maumere.'],
-            ['Ruteng', 'Ende',       130000, 240,  180, 'Dari Kota Dingin ke Kota Pancasila lewat pesisir selatan.'],
-            ['Ende', 'Ruteng',       130000, 240,  180, 'Balik dari Ende ke Kota Dingin.'],
-            ['Bajawa', 'Ende',       150000, 240,  170, 'Dari Kota Adat Bajawa ke Kota Pancasila Ende.'],
-            ['Ende', 'Bajawa',       150000, 240,  170, 'Dari Ende ke Bajawa — kota adat Ngada.'],
         ];
 
         $sesiList = ['pagi', 'siang']; // 'pagi' = 08:00, 'siang' = 12:00 (per Alpine js blade)
@@ -82,16 +77,17 @@ class RouteSeeder extends Seeder
         $this->command->info("  Assignment (rute x sesi): {$assignmentCount}");
         $this->command->info("  Mitra pemilik: {$mitraId}");
 
-        // Pastikan minimal 3 kendaraan mitra punya sopir untuk travel
-        $kendaraanBersopir = DB::table('vehicles')
+        // Pastikan ada unit khusus travel yang bersopir (auto-assign butuh ini)
+        $kendaraanTravel = DB::table('vehicles')
             ->where('mitra_id', $mitraId)
             ->where('is_approved', true)
             ->where('status', 'tersedia')
+            ->whereIn('layanan', ['travel', 'keduanya'])
             ->whereNotNull('sopir_id')
             ->count();
 
-        if ($kendaraanBersopir < 3) {
-            $this->command->warn("Kendaraan mitra yang punya sopir cuma {$kendaraanBersopir}. Sebaiknya assign sopir ke minimal 3 kendaraan.");
+        if ($kendaraanTravel < 2) {
+            $this->command->warn("Unit travel bersopir cuma {$kendaraanTravel}. Jalankan Fleet2026Seeder atau assign sopir ke unit travel.");
         }
     }
 }

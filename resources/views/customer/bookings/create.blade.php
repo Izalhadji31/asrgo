@@ -611,6 +611,7 @@
                         'id' => $v->id,
                         'nama' => $v->nama,
                         'plat_nomor' => $v->plat_nomor,
+                        'warna' => $v->warna,
                         'foto' => $v->foto_url,
                         'jenis' => $v->jenis,
                         'harga' => $v->harga_sewa_dengan_sopir_per_hari,
@@ -633,7 +634,7 @@
                         @endif
                     </div>
                     <p class="font-semibold text-slate-800">{{ $v->nama }}</p>
-                    <p class="font-[IBM_Plex_Mono] text-sm text-slate-600">{{ $v->plat_nomor }}</p>
+                    <p class="font-[IBM_Plex_Mono] text-sm text-slate-600">{{ $v->plat_nomor }}@if ($v->warna) <span class="font-sans text-slate-500">- {{ $v->warna }}</span>@endif</p>
                     <p class="text-xs capitalize text-slate-500">{{ $v->jenis }}</p>
                     @if ($v->sopir)
                         <span class="mt-1 inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-medium text-blue-700">

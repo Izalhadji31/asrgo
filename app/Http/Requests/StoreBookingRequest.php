@@ -22,6 +22,7 @@ class StoreBookingRequest extends FormRequest
                 'nullable',
                 Rule::exists('vehicles', 'id')->where(fn ($query) => $query
                     ->where('is_approved', true)
+                    ->whereIn('layanan', ['rental', 'keduanya'])
                     ->where('status', 'tersedia')),
             ],
             'route_id'        => [

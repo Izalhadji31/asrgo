@@ -30,6 +30,29 @@
                     </div>
 
                     <div>
+                        <label class="mb-1.5 block text-sm font-medium text-slate-700">Warna Unit</label>
+                        <input type="text" name="warna" value="{{ old('warna') }}" class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 transition focus:border-[#3F7D6C] focus:outline-none focus:ring-2 focus:ring-[#3F7D6C]/20" placeholder="Contoh: Putih, Hitam, Silver">
+                        @error('warna') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label class="mb-1.5 block text-sm font-medium text-slate-700">Jenis Layanan</label>
+                        <select name="layanan" class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm text-slate-800 transition focus:border-[#3F7D6C] focus:outline-none focus:ring-2 focus:ring-[#3F7D6C]/20">
+                            <option value="keduanya" @selected(old('layanan', 'keduanya') === 'keduanya')>Rental &amp; Travel</option>
+                            <option value="rental" @selected(old('layanan') === 'rental')>Rental saja</option>
+                            <option value="travel" @selected(old('layanan') === 'travel')>Travel saja</option>
+                        </select>
+                        <p class="mt-1 text-xs text-slate-500">Unit travel dipakai untuk rute antar kota, unit rental untuk sewa harian.</p>
+                        @error('layanan') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
+                        <label class="mb-1.5 block text-sm font-medium text-slate-700">Kota Operasi (unit travel)</label>
+                        <input type="text" name="kota_operasi" value="{{ old('kota_operasi') }}" class="w-full rounded-xl border border-slate-300 px-4 py-2.5 text-sm text-slate-800 placeholder-slate-400 transition focus:border-[#3F7D6C] focus:outline-none focus:ring-2 focus:ring-[#3F7D6C]/20" placeholder="Contoh: Ende atau Mbay">
+                        @error('kota_operasi') <p class="mt-1 text-xs text-red-600">{{ $message }}</p> @enderror
+                    </div>
+
+                    <div>
                         <label class="mb-1.5 block text-sm font-medium text-slate-700">Kapasitas Penumpang</label>
                         <div class="relative">
                             <input type="number" name="kapasitas_penumpang" value="{{ old('kapasitas_penumpang', 4) }}" min="1" max="100" class="w-full rounded-xl border border-slate-300 px-4 py-2.5 pr-20 text-sm text-slate-800 transition focus:border-[#3F7D6C] focus:outline-none focus:ring-2 focus:ring-[#3F7D6C]/20" placeholder="Contoh: 7" required>

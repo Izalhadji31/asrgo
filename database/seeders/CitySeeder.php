@@ -117,18 +117,21 @@ class CitySeeder extends Seeder
         ];
 
         foreach ($cities as $city) {
-            DB::table('cities')->insert([
-                'name' => $city['name'],
-                'slug' => $city['slug'],
-                'initials' => $city['initials'],
-                'description' => $city['description'],
-                'latitude' => $city['latitude'],
-                'longitude' => $city['longitude'],
-                'is_popular' => $city['is_popular'],
-                'image_url' => $city['image_url'],
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
+            // Idempotent: kunci slug, aman dijalankan berulang.
+            DB::table('cities')->updateOrInsert(
+                ['slug' => $city['slug']],
+                [
+                    'name' => $city['name'],
+                    'initials' => $city['initials'],
+                    'description' => $city['description'],
+                    'latitude' => $city['latitude'],
+                    'longitude' => $city['longitude'],
+                    'is_popular' => $city['is_popular'],
+                    'image_url' => $city['image_url'],
+                    'created_at' => now(),
+                    'updated_at' => now(),
+                ]
+            );
         }
 
         $this->command->info('Cities seeder completed successfully!');

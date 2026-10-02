@@ -31,6 +31,8 @@ class VehicleController extends Controller
         $vehicles = Vehicle::with(['mitra', 'sopir'])->latest()->get();
         $mitras = User::where('role', 'mitra')->get();
         $drivers = User::where('role', 'driver')->get();
+        // Satu sopir hanya untuk satu unit: peta sopir -> unit yang sedang dipegang.
+        $sopirUnit = Vehicle::whereNotNull('sopir_id')->get(['id', 'sopir_id', 'nama', 'plat_nomor'])->keyBy('sopir_id');
         $stats = [
             'total' => $vehicles->count(),
             'tersedia' => $vehicles->where('status', 'tersedia')->count(),
@@ -39,7 +41,7 @@ class VehicleController extends Controller
             'pendingApproval' => $vehicles->where('is_approved', false)->count(),
         ];
 
-        return view('admin.vehicles.index', compact('vehicles', 'mitras', 'drivers', 'stats'));
+        return view('admin.vehicles.index', compact('vehicles', 'mitras', 'drivers', 'sopirUnit', 'stats'));
     }
 
     public function create()
@@ -49,8 +51,9 @@ class VehicleController extends Controller
 
     public function store(StoreVehicleRequest $request)
     {
-        $data = $request->only(['nama', 'plat_nomor', 'jenis', 'kapasitas_penumpang', 'prioritas_travel', 'status', 'harga_sewa_tanpa_sopir_per_hari', 'harga_sewa_dengan_sopir_per_hari']);
+        $data = $request->only(['nama', 'plat_nomor', 'jenis', 'warna', 'kota_operasi', 'layanan', 'kapasitas_penumpang', 'prioritas_travel', 'status', 'harga_sewa_tanpa_sopir_per_hari', 'harga_sewa_dengan_sopir_per_hari']);
         $data['kapasitas_penumpang'] ??= 4;
+        $data['layanan'] ??= 'keduanya';
         $data['prioritas_travel'] ??= 0;
         $data['tarif_sopir_harian'] = $request->integer('tarif_sopir_harian', 150000);
         $data['mitra_id'] = Auth::id();
@@ -74,7 +77,7 @@ class VehicleController extends Controller
 
     public function update(UpdateVehicleRequest $request, Vehicle $vehicle)
     {
-        $fields = ['nama', 'plat_nomor', 'jenis', 'kapasitas_penumpang', 'status', 'harga_sewa_tanpa_sopir_per_hari', 'harga_sewa_dengan_sopir_per_hari', 'tarif_sopir_harian'];
+        $fields = ['nama', 'plat_nomor', 'jenis', 'warna', 'kota_operasi', 'layanan', 'kapasitas_penumpang', 'status', 'harga_sewa_tanpa_sopir_per_hari', 'harga_sewa_dengan_sopir_per_hari', 'tarif_sopir_harian'];
         if (Auth::user()->role === 'mitra') {
             $fields[] = 'prioritas_travel';
         }

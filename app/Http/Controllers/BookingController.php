@@ -199,6 +199,7 @@ class BookingController extends Controller
     {
         $vehicles = Vehicle::where('is_approved', true)
             ->where('status', 'tersedia')
+            ->whereIn('layanan', ['rental', 'keduanya'])
             ->get();
 
         $vehiclesData = $vehicles->map(fn ($vehicle) => [

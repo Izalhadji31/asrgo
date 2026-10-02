@@ -9,35 +9,27 @@ class UserSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     * Idempotent: aman dijalankan berulang (tidak error duplikat email).
      */
     public function run(): void
     {
-        User::create([
-            'name' => 'Admin',
-            'email' => 'admin@asrgo.test',
-            'password' => bcrypt('password'),
-            'role' => 'admin',
-        ]);
+        $users = [
+            ['Admin', 'admin@asrgo.test', 'admin'],
+            ['Mitra', 'mitra@asrgo.test', 'mitra'],
+            ['Driver', 'driver@asrgo.test', 'driver'],
+            ['Customer', 'customer@asrgo.test', 'customer'],
+        ];
 
-        User::create([
-            'name' => 'Mitra',
-            'email' => 'mitra@asrgo.test',
-            'password' => bcrypt('password'),
-            'role' => 'mitra',
-        ]);
-
-        User::create([
-            'name' => 'Driver',
-            'email' => 'driver@asrgo.test',
-            'password' => bcrypt('password'),
-            'role' => 'driver',
-        ]);
-
-        User::create([
-            'name' => 'Customer',
-            'email' => 'customer@asrgo.test',
-            'password' => bcrypt('password'),
-            'role' => 'customer',
-        ]);
+        foreach ($users as [$nama, $email, $role]) {
+            User::firstOrCreate(
+                ['email' => $email],
+                [
+                    'name' => $nama,
+                    'password' => bcrypt('password'),
+                    'role' => $role,
+                    'email_verified_at' => now(),
+                ]
+            );
+        }
     }
 }

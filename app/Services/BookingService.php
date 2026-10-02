@@ -248,6 +248,7 @@ class BookingService
         $vehicles = Vehicle::where('mitra_id', $mitraId)
             ->where('is_approved', true)
             ->where('status', 'tersedia')
+            ->whereIn('layanan', ['travel', 'keduanya'])
             ->whereNotNull('sopir_id')
             ->with('sopir')
             ->orderByRaw('CASE WHEN prioritas_travel > 0 THEN 0 ELSE 1 END')

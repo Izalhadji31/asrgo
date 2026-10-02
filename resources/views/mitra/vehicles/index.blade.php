@@ -129,7 +129,18 @@
                                         @else
                                             <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-slate-100 text-xs font-semibold text-slate-500">N/A</div>
                                         @endif
-                                        <span class="font-medium text-slate-800">{{ $vehicle->nama }}</span>
+                                        <div>
+                                            <span class="font-medium text-slate-800">{{ $vehicle->nama }}</span>
+                                            <div class="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs">
+                                                @if ($vehicle->warna)
+                                                    <span class="text-slate-500">{{ $vehicle->warna }}</span>
+                                                @endif
+                                                <span class="rounded-full bg-slate-100 px-2 py-0.5 font-semibold text-slate-600">{{ match ($vehicle->layanan) { 'rental' => 'Rental', 'travel' => 'Travel', default => 'Rental & Travel' } }}</span>
+                                                @if ($vehicle->kota_operasi)
+                                                    <span class="rounded-full bg-teal-50 px-2 py-0.5 font-semibold text-teal-700">Basis {{ $vehicle->kota_operasi }}</span>
+                                                @endif
+                                            </div>
+                                        </div>
                                     </div>
                                 </td>
                                 <td class="px-5 py-4 font-[IBM_Plex_Mono] text-slate-700">{{ $vehicle->plat_nomor }}</td>
