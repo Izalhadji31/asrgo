@@ -33,6 +33,10 @@ class Booking extends Model
 
     public const PAYMENT_SCHEME_FULL = 'full';
 
+    public const PAYMENT_METHOD_MIDTRANS = 'midtrans';
+
+    public const PAYMENT_METHOD_CASH = 'cash';
+
     public const REFUND_NONE = 'none';
 
     public const REFUND_REQUESTED = 'requested';
@@ -70,6 +74,7 @@ class Booking extends Model
         'payment_transaction_id',
         'payment_type',
         'payment_scheme',
+        'payment_method',
         'payment_amount',
         'payment_paid_at',
         'payment_expired_at',
@@ -167,18 +172,18 @@ class Booking extends Model
         };
     }
 
-    public function paymentSchemeLabel(): string
+    public function paymentMethodLabel(): string
     {
-        return match ($this->payment_scheme) {
-            self::PAYMENT_SCHEME_DP => 'DP 30%',
-            default => 'Lunas',
+        return match ($this->payment_method) {
+            self::PAYMENT_METHOD_CASH => 'Cash / Tunai',
+            self::PAYMENT_METHOD_MIDTRANS => 'Midtrans (Online)',
+            default => $this->payment_status === self::PAYMENT_PAID ? 'Midtrans (Online)' : 'Belum Dipilih',
         };
     }
 
     public function isFullyPaid(): bool
     {
-        return $this->payment_status === self::PAYMENT_PAID
-            && $this->payment_scheme !== self::PAYMENT_SCHEME_DP;
+        return $this->payment_status === self::PAYMENT_PAID;
     }
 
     public function canTransitionTo(string $nextStatus): bool

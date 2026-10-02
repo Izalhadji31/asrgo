@@ -64,7 +64,7 @@ class PaymentPageTest extends TestCase
             ->assertForbidden();
     }
 
-    public function test_unpaid_rental_payment_page_shows_payment_scheme_options(): void
+    public function test_unpaid_booking_payment_page_shows_payment_method_options(): void
     {
         $customer = User::factory()->create(['role' => 'customer']);
         $booking = $this->booking($customer, [
@@ -75,8 +75,8 @@ class PaymentPageTest extends TestCase
         $this->actingAs($customer)
             ->get(route('payments.show', $booking))
             ->assertOk()
-            ->assertSee('DP 30%')
-            ->assertSee('Lunas');
+            ->assertSee('Bayar Online (Midtrans)')
+            ->assertSee('Bayar Cash / Tunai');
     }
 
     private function booking(User $customer, array $attributes = []): Booking

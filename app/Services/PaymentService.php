@@ -14,7 +14,7 @@ class PaymentService
         private readonly NotificationService $notificationService,
     ) {}
 
-    public function createSnapTransaction(Booking $booking, string $scheme = 'full'): Booking
+    public function createSnapTransaction(Booking $booking): Booking
     {
         if (in_array($booking->status, [Booking::STATUS_COMPLETED, Booking::STATUS_CANCELLED], true)) {
             throw new RuntimeException('Booking yang sudah selesai atau dibatalkan tidak dapat dibayar.');
@@ -30,14 +30,6 @@ class PaymentService
             return $booking;
         }
 
-        if ($scheme !== Booking::PAYMENT_SCHEME_DP && $scheme !== Booking::PAYMENT_SCHEME_FULL) {
-            $scheme = Booking::PAYMENT_SCHEME_FULL;
-        }
-
-        if ($booking->service_type === 'travel' && $scheme === Booking::PAYMENT_SCHEME_DP) {
-            throw new RuntimeException('Travel wajib dibayar lunas di awal.');
-        }
-
         $serverKey = (string) config('services.midtrans.server_key');
         if ($serverKey === '') {
             throw new RuntimeException('Midtrans server key belum dikonfigurasi.');
@@ -47,10 +39,7 @@ class PaymentService
         $orderId = 'ASRGO-'.$booking->id.'-'.Str::upper(Str::random(10));
         $customer = $booking->pelanggan;
 
-        $isDownPayment = $scheme === Booking::PAYMENT_SCHEME_DP;
-        $grossAmount = $isDownPayment
-            ? (int) ceil($booking->total_harga * 0.30)
-            : (int) $booking->total_harga;
+        $grossAmount = (int) $booking->total_harga;
 
         $transaction = [
             'transaction_details' => [
@@ -61,9 +50,7 @@ class PaymentService
                 'id' => 'booking-'.$booking->id,
                 'price' => $grossAmount,
                 'quantity' => 1,
-                'name' => $isDownPayment
-                    ? 'DP 30% Booking ASR GO #'.$booking->id
-                    : 'Pembayaran Booking ASR GO #'.$booking->id,
+                'name' => 'Pembayaran Booking ASR GO #'.$booking->id,
             ]],
             'customer_details' => [
                 'first_name' => $customer?->name ?? 'Customer',
@@ -103,7 +90,8 @@ class PaymentService
             'payment_status' => Booking::PAYMENT_PENDING,
             'payment_order_id' => $orderId,
             'payment_token' => $token,
-            'payment_scheme' => $scheme,
+            'payment_scheme' => Booking::PAYMENT_SCHEME_FULL,
+            'payment_method' => Booking::PAYMENT_METHOD_MIDTRANS,
             'payment_amount' => $grossAmount,
             'payment_expired_at' => now()->addDay(),
         ])->save();
@@ -218,15 +206,13 @@ class PaymentService
                 $booking->id
             );
 
-            $paymentLabel = $booking->payment_scheme === Booking::PAYMENT_SCHEME_DP
-                ? 'DP 30% (Rp '.number_format($booking->payment_amount ?? 0, 0, ',', '.').')'
-                : 'lunas (Rp '.number_format($booking->payment_amount ?? $booking->total_harga, 0, ',', '.').')';
+            $paymentLabel = 'lunas (Rp '.number_format($booking->payment_amount ?? $booking->total_harga, 0, ',', '.').')';
 
             foreach (\App\Models\User::where('role', 'admin')->pluck('id') as $adminId) {
                 $this->notificationService->log(
                     $adminId,
                     'payment_paid_admin',
-                    'Booking #'.$booking->id.' telah dibayar '.$paymentLabel.'. Sisa pelunasan dapat dikonfirmasi di panel admin.',
+                    'Booking #'.$booking->id.' telah dibayar '.$paymentLabel.'. Silakan proses tiket pemesanan.',
                     Booking::class,
                     $booking->id
                 );

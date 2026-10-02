@@ -127,7 +127,7 @@ class BookingController extends Controller
                     $statusLabels[$booking->status] ?? $booking->status,
                     $booking->ticket_number ?? '-',
                     $paymentLabels[$booking->payment_status] ?? $booking->payment_status,
-                    $booking->payment_scheme === 'dp' ? 'DP 30%' : 'Lunas Penuh',
+                    $booking->paymentMethodLabel(),
                     (int) ($booking->payment_amount ?? 0),
                 ]);
             }
@@ -783,16 +783,19 @@ class BookingController extends Controller
 
     public function markAsFullyPaid(Booking $booking)
     {
-        if ($booking->payment_status !== Booking::PAYMENT_PAID) {
-            return redirect()->back()->withErrors(['booking' => 'Booking belum memiliki pembayaran yang diterima.']);
-        }
-
-        if ($booking->payment_scheme !== Booking::PAYMENT_SCHEME_DP) {
+        if ($booking->payment_status === Booking::PAYMENT_PAID) {
             return redirect()->back()->with('info', 'Booking ini sudah berstatus lunas.');
         }
 
+        if (in_array($booking->status, [Booking::STATUS_COMPLETED, Booking::STATUS_CANCELLED], true)) {
+            return redirect()->back()->withErrors(['booking' => 'Booking yang sudah selesai atau dibatalkan tidak dapat ditandai lunas.']);
+        }
+
         $booking->forceFill([
+            'payment_status' => Booking::PAYMENT_PAID,
+            'payment_method' => $booking->payment_method ?: Booking::PAYMENT_METHOD_CASH,
             'payment_scheme' => Booking::PAYMENT_SCHEME_FULL,
+            'payment_amount' => (int) $booking->total_harga,
             'payment_paid_at' => now(),
         ])->save();
 
@@ -801,12 +804,12 @@ class BookingController extends Controller
         $this->notificationService->log(
             $booking->pelanggan_id,
             'payment_settled',
-            'Pelunasan booking Anda telah dikonfirmasi admin. Booking kini berstatus lunas.',
+            'Pembayaran booking Anda telah dikonfirmasi lunas oleh admin.',
             Booking::class,
             $booking->id
         );
 
-        return redirect()->back()->with('success', 'Booking ditandai lunas. Sisa pembayaran telah dikonfirmasi manual.');
+        return redirect()->back()->with('success', 'Booking ditandai lunas. Pembayaran telah dikonfirmasi.');
     }
 
     public function cancel(Booking $booking)

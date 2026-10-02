@@ -325,12 +325,6 @@ class BookingService
             ]);
         }
 
-        if ($booking->payment_scheme === Booking::PAYMENT_SCHEME_DP) {
-            throw ValidationException::withMessages([
-                'booking' => 'Booking masih berstatus DP 30%. Konfirmasi pelunasan di panel admin terlebih dahulu.',
-            ]);
-        }
-
         $booking->transitionTo(Booking::STATUS_COMPLETED);
 
         if ($booking->vehicle) {

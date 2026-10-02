@@ -32,9 +32,25 @@ class PaymentController extends Controller
 
         $this->authorize('pay', $booking);
 
-        $scheme = (string) $request->query('scheme', '');
-        if (! in_array($scheme, [Booking::PAYMENT_SCHEME_DP, Booking::PAYMENT_SCHEME_FULL], true)) {
-            $scheme = '';
+        $method = (string) $request->query('method', '');
+        if (! in_array($method, [Booking::PAYMENT_METHOD_MIDTRANS, Booking::PAYMENT_METHOD_CASH], true)) {
+            $method = '';
+        }
+
+        // Bayar tunai: catat metode saja, pembayaran dikonfirmasi admin (tanpa transaksi Midtrans).
+        if ($method === Booking::PAYMENT_METHOD_CASH) {
+            $booking->forceFill([
+                'payment_method' => Booking::PAYMENT_METHOD_CASH,
+                'payment_scheme' => Booking::PAYMENT_SCHEME_FULL,
+                'payment_amount' => (int) $booking->total_harga,
+            ])->save();
+
+            return view('payments.show', [
+                'booking' => $booking->fresh(),
+                'snapToken' => null,
+                'error' => null,
+                'method' => Booking::PAYMENT_METHOD_CASH,
+            ]);
         }
 
         $error = null;
@@ -47,11 +63,9 @@ class PaymentController extends Controller
 
         if ($hasActiveToken) {
             $snapToken = $booking->payment_token;
-        } elseif ($scheme !== '' || $booking->service_type === 'travel') {
-            // Travel selalu lunas; rental bisa DP 30% atau lunas sesuai pilihan user.
-            $useScheme = $scheme !== '' ? $scheme : Booking::PAYMENT_SCHEME_FULL;
+        } elseif ($method === Booking::PAYMENT_METHOD_MIDTRANS) {
             try {
-                $booking = $this->paymentService->createSnapTransaction($booking, $useScheme);
+                $booking = $this->paymentService->createSnapTransaction($booking);
                 $snapToken = $booking->payment_token;
             } catch (Throwable $exception) {
                 Log::error('Unable to prepare booking payment.', [
@@ -68,7 +82,7 @@ class PaymentController extends Controller
             'booking' => $booking,
             'snapToken' => $snapToken,
             'error' => $error,
-            'scheme' => $booking?->payment_scheme ?? ($scheme !== '' ? $scheme : null),
+            'method' => $booking?->payment_method ?? ($method !== '' ? $method : null),
         ]);
     }
 

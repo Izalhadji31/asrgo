@@ -124,8 +124,8 @@
                         <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $paymentClass }}">{{ $paymentLabels[$booking->payment_status] ?? $booking->payment_status }}</span>
                     </div>
                     <div class="flex items-center justify-between">
-                        <span class="text-slate-500">Skema</span>
-                        <span class="font-medium text-slate-700">{{ $booking->payment_scheme === 'dp' ? 'DP 30%' : 'Lunas Penuh' }}</span>
+                        <span class="text-slate-500">Metode Pembayaran</span>
+                        <span class="font-medium text-slate-700">{{ $booking->paymentMethodLabel() }}</span>
                     </div>
                     <div class="flex items-center justify-between">
                         <span class="text-slate-500">Nominal Dibayar</span>

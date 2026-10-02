@@ -155,7 +155,7 @@
                     @endphp
                     <span class="badge {{ $paymentBadge }}">{{ $paymentLabel }}</span>
                 </div></td>
-                <td><div class="label">Skema</div><div class="value">{{ $booking->payment_scheme === 'dp' ? 'DP 30%' : 'Lunas Penuh' }}</div></td>
+                <td><div class="label">Metode Pembayaran</div><div class="value">{{ $booking->paymentMethodLabel() }}</div></td>
                 <td><div class="label">Nominal Dibayar</div><div class="value">Rp {{ number_format($booking->payment_amount ?? 0, 0, ',', '.') }}</div></td>
             </tr>
         </table>
@@ -166,10 +166,10 @@
                     <td class="info" style="width:25%">Total Harga</td>
                     <td class="num"><strong>Rp {{ number_format($booking->total_harga, 0, ',', '.') }}</strong></td>
                 </tr>
-                @if ($booking->payment_status === 'paid' && $booking->payment_scheme === 'dp')
+                @if ($booking->payment_paid_at)
                 <tr>
-                    <td class="info">Sisa Pembayaran (70%)</td>
-                    <td class="num">Rp {{ number_format($booking->total_harga - (int) ($booking->payment_amount ?? 0), 0, ',', '.') }} <span class="info">— dikonfirmasi manual oleh admin</span></td>
+                    <td class="info">Tanggal Pembayaran</td>
+                    <td class="num">{{ $booking->payment_paid_at->translatedFormat('d F Y, H:i') }} WITA</td>
                 </tr>
                 @endif
                 <tr class="total">
