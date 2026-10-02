@@ -523,6 +523,50 @@ class BookingController extends Controller
         return back()->with('success', 'Refund disetujui dan sudah diajukan ke Midtrans.');
     }
 
+    /**
+     * Refund manual untuk pembayaran tunai (cash): dana diserahkan admin di kantor,
+     * tanpa memanggil API Midtrans. Booking langsung ditutup sebagai dibatalkan.
+     */
+    public function markManualRefund(Booking $booking)
+    {
+        $this->authorize('approveRefund', $booking);
+
+        if ($booking->refund_status !== Booking::REFUND_REQUESTED) {
+            return back()->withErrors(['refund' => 'Tidak ada pengajuan refund yang menunggu diproses.']);
+        }
+
+        if ($booking->payment_status !== Booking::PAYMENT_PAID) {
+            return back()->withErrors(['refund' => 'Refund hanya untuk pemesanan yang sudah dibayar.']);
+        }
+
+        if ($booking->payment_order_id) {
+            return back()->withErrors(['refund' => 'Booking ini dibayar lewat Midtrans. Gunakan tombol "Setujui & Proses".']);
+        }
+
+        $nominal = (int) ($booking->payment_amount ?? $booking->total_harga);
+
+        $booking->forceFill([
+            'refund_status' => Booking::REFUND_COMPLETED,
+            'refund_amount' => $nominal,
+            'refund_reviewed_at' => now(),
+            'refunded_at' => now(),
+        ])->save();
+
+        AuditLog::record('manual_refund', 'Menandai refund tunai selesai untuk booking #'.$booking->id, Booking::class, $booking->id);
+
+        $this->notificationService->log(
+            $booking->pelanggan_id,
+            'refund_completed',
+            'Refund sebesar Rp '.number_format($nominal, 0, ',', '.').' telah diproses. Dana dapat diambil di kantor CV. IzalhadjiTravel.',
+            Booking::class,
+            $booking->id
+        );
+
+        $this->bookingService->cancelByAdmin($booking);
+
+        return back()->with('success', 'Refund tunai ditandai selesai. Serahkan dana ke pelanggan di kantor.');
+    }
+
     public function rejectRefund(Request $request, Booking $booking)
     {
         $this->authorize('rejectRefund', $booking);

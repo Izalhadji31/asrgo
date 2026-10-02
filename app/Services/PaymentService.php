@@ -266,7 +266,7 @@ class PaymentService
         }
 
         if (! $booking->payment_order_id) {
-            throw new RuntimeException('Order ID Midtrans tidak tersedia untuk refund.');
+            throw new RuntimeException('Booking ini dibayar tunai (tanpa transaksi Midtrans). Gunakan tombol "Tandai Refund Tunai Selesai".');
         }
 
         $serverKey = (string) config('services.midtrans.server_key');

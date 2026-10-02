@@ -438,10 +438,17 @@
                           <div class="rounded-lg border border-orange-200 bg-orange-50 p-4">
                               <p class="mb-3 text-sm font-semibold text-orange-900">Review Pengajuan Refund</p>
                               <div class="flex flex-wrap gap-2">
+                                  @if ($booking->payment_order_id)
                                   <form action="{{ route('admin.bookings.refund.approve', $booking) }}" method="POST" class="flex-1" onsubmit="return confirm('Setujui refund dan ajukan ke Midtrans?')">
                                       @csrf
                                       <button class="w-full rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">Setujui & Proses</button>
                                   </form>
+                                  @else
+                                  <form action="{{ route('admin.bookings.refund.manual', $booking) }}" method="POST" class="flex-1" onsubmit="return confirm('Konfirmasi dana tunai sudah diserahkan ke pelanggan?')">
+                                      @csrf
+                                      <button class="w-full rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-700">Tandai Refund Tunai Selesai</button>
+                                  </form>
+                                  @endif
                                   <form action="{{ route('admin.bookings.refund.reject', $booking) }}" method="POST" class="flex-1" onsubmit="return confirm('Tolak pengajuan refund ini?')">
                                       @csrf
                                       <input type="text" name="refund_rejection_reason" minlength="5" maxlength="1000" required placeholder="Alasan penolakan" class="mb-2 w-full rounded-lg border border-red-200 px-3 py-2 text-xs">
@@ -451,7 +458,7 @@
                           </div>
                       @endif
 
-                      @if ($booking->payment_status === 'paid' && !in_array($booking->status, ['completed', 'cancelled'], true) && in_array($booking->refund_status, ['none', 'failed'], true))
+                      @if ($booking->payment_status === 'paid' && $booking->payment_order_id && !in_array($booking->status, ['completed', 'cancelled'], true) && in_array($booking->refund_status, ['none', 'failed'], true))
                       <form action="{{ route('admin.bookings.refund', $booking) }}" method="POST" onsubmit="return confirm('Ajukan refund penuh untuk booking ini?')">
                           @csrf
                           <button class="w-full rounded-lg border border-red-200 px-5 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-50">Refund Langsung via Midtrans</button>

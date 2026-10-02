@@ -81,6 +81,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->group(function () {
     Route::post('/bookings/{booking}/refund', [BookingController::class, 'refund'])->name('admin.bookings.refund');
     Route::post('/bookings/{booking}/refund/approve', [BookingController::class, 'approveRefund'])->name('admin.bookings.refund.approve');
     Route::post('/bookings/{booking}/refund/reject', [BookingController::class, 'rejectRefund'])->name('admin.bookings.refund.reject');
+    Route::post('/bookings/{booking}/refund/manual', [BookingController::class, 'markManualRefund'])->name('admin.bookings.refund.manual');
     Route::post('/bookings/{booking}/mark-paid', [BookingController::class, 'markAsFullyPaid'])->name('admin.bookings.mark-paid');
     Route::post('/bookings/{booking}/cancel', [BookingController::class, 'adminCancel'])->name('admin.bookings.cancel');
     Route::post('/bookings/{booking}/update', [BookingController::class, 'updateDetails'])->name('admin.bookings.update');
