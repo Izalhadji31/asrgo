@@ -804,7 +804,7 @@ class BookingController extends Controller
         $this->notificationService->log(
             $booking->pelanggan_id,
             'payment_settled',
-            'Pembayaran booking Anda telah dikonfirmasi lunas oleh admin.',
+            'Pembayaran booking Anda telah dikonfirmasi lunas oleh admin. Bukti pembayaran dapat dicetak dari halaman pemesanan.',
             Booking::class,
             $booking->id
         );

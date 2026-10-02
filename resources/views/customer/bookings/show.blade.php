@@ -177,7 +177,7 @@
             @endif
 
             @if ($booking->payment_status === 'paid')
-                <a href="{{ route('bookings.invoice', $booking) }}" target="_blank" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100">Cetak Invoice</a>
+                <a href="{{ route('bookings.invoice', $booking) }}" target="_blank" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100">Cetak Invoice / Bukti Pembayaran</a>
             @endif
 
             @if (in_array($booking->status, ['pending', 'sopir_assigned'], true) && $booking->payment_status === 'paid' && $booking->refund_status === 'none' && ! $dep)

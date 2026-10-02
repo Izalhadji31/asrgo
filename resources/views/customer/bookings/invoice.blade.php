@@ -57,7 +57,7 @@
         <div class="header">
             <div>
                 <h1>ASR GO</h1>
-                <h2>Invoice / Faktur Pembayaran</h2>
+                <h2>Invoice &amp; Bukti Pembayaran</h2>
                 <p>Layanan Rental & Travel — Flores, NTT</p>
             </div>
             <div class="inv-no">
@@ -70,6 +70,19 @@
             <span>Tanggal Invoice: {{ now()->translatedFormat('d F Y') }}</span>
             <span>Dicetak: {{ now()->translatedFormat('d F Y, H:i') }} — {{ Auth::user()->name }}</span>
         </div>
+
+        @if ($booking->payment_status === 'paid')
+        <div style="margin-top:8px;border:1.5px solid #166534;background:#f0fdf4;color:#166534;padding:10px 12px;">
+            <div style="font-size:12px;font-weight:bold;letter-spacing:0.5px;">BUKTI PEMBAYARAN SAH</div>
+            <div style="margin-top:4px;font-size:11px;">
+                Metode: <strong>{{ $booking->paymentMethodLabel() }}</strong>
+                &nbsp;|&nbsp; Tanggal bayar: <strong>{{ $booking->payment_paid_at?->translatedFormat('d F Y, H:i') ?? '-' }} WITA</strong>
+                &nbsp;|&nbsp; Nominal: <strong>Rp {{ number_format($booking->payment_amount ?? $booking->total_harga, 0, ',', '.') }}</strong>
+                &nbsp;|&nbsp; Status: <strong>LUNAS</strong>
+            </div>
+            <div style="margin-top:4px;font-size:10px;">Dokumen ini merupakan bukti transaksi resmi ASR GO (CV. IzalhadjiTravel) dan dapat dicetak ulang dari halaman pemesanan.</div>
+        </div>
+        @endif
 
         <h3>Data Pemesan</h3>
         <table>

@@ -201,7 +201,7 @@ class PaymentService
             $this->notificationService->log(
                 $booking->pelanggan_id,
                 'payment_paid',
-                'Pembayaran booking Anda berhasil diterima. Booking menunggu proses tiket.',
+                'Pembayaran booking Anda berhasil diterima. Bukti pembayaran dapat dicetak dari halaman pemesanan.',
                 Booking::class,
                 $booking->id
             );
@@ -276,8 +276,8 @@ class PaymentService
 
         $refundKey = 'ASRGO-REFUND-'.$booking->id.'-'.Str::upper(Str::random(10));
         // Nominal refund = uang yang benar-benar diterima lewat Midtrans.
-        // Untuk booking DP 30% yang sisanya dilunasi manual, Midtrans hanya memegang nominal DP;
-        // sisa pelunasan manual dikembalikan admin di luar sistem.
+        // Bila nominal yang diterima lebih kecil dari total harga (mis. data lama atau penyesuaian),
+        // Midtrans hanya mengembalikan nominal yang benar-benar diterima; selisih ditangani admin manual.
         $refundAmount = (int) ($booking->payment_amount ?? $booking->total_harga);
         $manualRemainder = max(0, (int) $booking->total_harga - $refundAmount);
         $response = Http::timeout(15)
