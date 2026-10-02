@@ -289,12 +289,17 @@ class PaymentService
         }
 
         $refundKey = 'ASRGO-REFUND-'.$booking->id.'-'.Str::upper(Str::random(10));
+        // Nominal refund = uang yang benar-benar diterima lewat Midtrans.
+        // Untuk booking DP 30% yang sisanya dilunasi manual, Midtrans hanya memegang nominal DP;
+        // sisa pelunasan manual dikembalikan admin di luar sistem.
+        $refundAmount = (int) ($booking->payment_amount ?? $booking->total_harga);
+        $manualRemainder = max(0, (int) $booking->total_harga - $refundAmount);
         $response = Http::timeout(15)
             ->withBasicAuth($serverKey, '')
             ->acceptJson()
             ->post(config('services.midtrans.core_api_url').'/v2/'.$booking->payment_order_id.'/refund', [
                 'refund_key' => $refundKey,
-                'amount' => (int) $booking->total_harga,
+                'amount' => $refundAmount,
                 'reason' => 'Refund booking ASR GO #'.$booking->id,
             ]);
 
@@ -310,14 +315,19 @@ class PaymentService
         $booking->forceFill([
             'refund_status' => Booking::REFUND_PENDING,
             'refund_id' => $response->json('refund_chargeback_id') ?: $refundKey,
-            'refund_amount' => $booking->total_harga,
+            'refund_amount' => $refundAmount,
             'payment_payload' => array_merge($booking->payment_payload ?? [], ['refund_response' => $response->json()]),
         ])->save();
 
         $this->notificationService->log(
             $booking->pelanggan_id,
             'refund_requested',
-            'Refund booking Anda sudah disetujui dan diajukan ke Midtrans.',
+            'Refund booking Anda sudah disetujui dan diajukan ke Midtrans sebesar Rp '
+                .number_format($refundAmount, 0, ',', '.').'.'
+                .($manualRemainder > 0
+                    ? ' Sisa pelunasan manual Rp '.number_format($manualRemainder, 0, ',', '.')
+                        .' dikembalikan langsung oleh admin (di luar Midtrans).'
+                    : ''),
             Booking::class,
             $booking->id
         );
