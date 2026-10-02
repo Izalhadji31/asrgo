@@ -214,6 +214,18 @@ class BookingService
                 );
             }
 
+            // Sopir juga dinotifikasi saat kendaraan+sopir otomatis ditugaskan di awal
+            // (rental dengan sopir maupun travel auto-assign), supaya sopir tahu harus konfirmasi.
+            if ($finalSopirId) {
+                $this->notificationService->log(
+                    $finalSopirId,
+                    'booking_assigned_driver',
+                    'Anda memiliki booking baru #'.$booking->id.' ('.$serviceLabel.') yang ditugaskan. Silakan konfirmasi di dashboard.',
+                    Booking::class,
+                    $booking->id
+                );
+            }
+
             return $booking;
         });
     }
