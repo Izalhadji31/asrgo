@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Booking;
 use App\Services\PaymentService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
@@ -17,7 +18,7 @@ class PaymentController extends Controller
         private readonly PaymentService $paymentService,
     ) {}
 
-    public function show(Request $request, Booking $booking): View|Response
+    public function show(Request $request, Booking $booking): View|Response|RedirectResponse
     {
         $this->ensureCustomerOwnsBooking($booking);
 
